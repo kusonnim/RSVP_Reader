@@ -1,15 +1,18 @@
 import { useState } from "react";
 import FileLoader from "../components/FileLoader";
+import ReaderView from "../components/ReaderView";
 import { tokenizeText } from "../lib/tokenizeText";
 import "./App.css";
 
 function App() {
   const [words, setWords] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [fileName, setFileName] = useState("");
   const [hasLoadedFile, setHasLoadedFile] = useState(false);
 
   const handleTextLoaded = (text: string, loadedFileName: string) => {
     setWords(tokenizeText(text));
+    setCurrentIndex(0);
     setFileName(loadedFileName);
     setHasLoadedFile(true);
   };
@@ -33,9 +36,7 @@ function App() {
           space bar.
         </p>
 
-        <div className="reader-placeholder" aria-label="Reader preview">
-          <span>{words.length > 0 ? "Text loaded" : "Ready"}</span>
-        </div>
+        <ReaderView words={words} currentIndex={currentIndex} />
 
         <FileLoader onTextLoaded={handleTextLoaded} />
 
