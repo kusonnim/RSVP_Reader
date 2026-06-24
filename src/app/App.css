@@ -1,3 +1,13 @@
+.app {
+  min-width: 20rem;
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+    color 180ms ease,
+    background-color 180ms ease;
+}
+
 .app-shell {
   width: min(100% - 2rem, 72rem);
   min-height: 100vh;
@@ -10,6 +20,70 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-selector {
+  display: flex;
+  gap: 0.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.25rem;
+  background: var(--color-surface);
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.55rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.theme-option:hover,
+.theme-option:has(input:focus-visible) {
+  color: var(--color-text);
+}
+
+.theme-option:has(input:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 0.15rem;
+}
+
+.theme-option.is-selected {
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+.theme-swatch {
+  width: 0.65rem;
+  height: 0.65rem;
+  border: 1px solid rgb(0 0 0 / 20%);
+  border-radius: 50%;
+}
+
+.theme-swatch-light {
+  background: #f5f3ee;
+}
+
+.theme-swatch-dark {
+  background: #1e201d;
+}
+
+.theme-swatch-sepia {
+  background: #d9c7a7;
 }
 
 .wordmark {
@@ -330,6 +404,20 @@
 
   .welcome-panel {
     margin-top: 4rem;
+  }
+
+  .header-actions {
+    align-items: flex-end;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .theme-option {
+    padding-inline: 0.45rem;
+  }
+
+  .theme-option span:last-child {
+    display: none;
   }
 
   .reader-view {
