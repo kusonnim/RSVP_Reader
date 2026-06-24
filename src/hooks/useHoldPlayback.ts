@@ -1,9 +1,10 @@
 import { useEffect } from "react";
-import { wpmToIntervalMs } from "../lib/timing";
+import { getWordDisplayDurationMs } from "../lib/smartTiming";
 
 type UseHoldPlaybackOptions = {
   isHolding: boolean;
   wpm: number;
+  currentWord: string;
   canAdvance: boolean;
   onAdvance: () => void;
   onStop: () => void;
@@ -12,6 +13,7 @@ type UseHoldPlaybackOptions = {
 export function useHoldPlayback({
   isHolding,
   wpm,
+  currentWord,
   canAdvance,
   onAdvance,
   onStop,
@@ -25,11 +27,13 @@ export function useHoldPlayback({
       return;
     }
 
-    const intervalId = window.setInterval(onAdvance, wpmToIntervalMs(wpm));
+    const timeoutId = window.setTimeout(
+      onAdvance,
+      getWordDisplayDurationMs(currentWord, wpm),
+    );
 
     return () => {
-      window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
     };
-  }, [canAdvance, isHolding, onAdvance, onStop, wpm]);
+  }, [canAdvance, currentWord, isHolding, onAdvance, onStop, wpm]);
 }
-

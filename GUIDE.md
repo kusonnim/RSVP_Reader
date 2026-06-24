@@ -429,13 +429,11 @@ Store:
 
 ## Smart Timing
 
-Add later:
-
 ```text
 lib/smartTiming.ts
 ```
 
-Potential behavior:
+Behavior:
 
 * Pause longer after periods
 * Pause slightly after commas

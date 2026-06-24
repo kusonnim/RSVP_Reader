@@ -70,6 +70,7 @@ function App() {
   useHoldPlayback({
     isHolding,
     wpm,
+    currentWord: words[currentIndex] ?? "",
     canAdvance: canGoNext,
     onAdvance: nextWord,
     onStop: () => setHolding(false),

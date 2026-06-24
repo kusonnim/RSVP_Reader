@@ -408,6 +408,12 @@
   text-align: center;
 }
 
+.smart-timing-note {
+  margin: 0.65rem 0 0;
+  color: var(--color-text-subtle);
+  font-size: 0.75rem;
+}
+
 .file-loader {
   display: grid;
   justify-items: center;

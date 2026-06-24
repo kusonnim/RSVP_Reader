@@ -89,6 +89,9 @@ function ReaderControls({
         </span>
         <span>Space pauses when released</span>
       </div>
+      <p className="smart-timing-note">
+        Smart pacing adds time for punctuation and longer words.
+      </p>
     </div>
   );
 }
