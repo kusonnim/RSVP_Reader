@@ -3,36 +3,50 @@ import FileLoader from "../components/FileLoader";
 import ProgressBar from "../components/ProgressBar";
 import ReaderControls from "../components/ReaderControls";
 import ReaderView from "../components/ReaderView";
-import { tokenizeText } from "../lib/tokenizeText";
+import { useHoldPlayback } from "../hooks/useHoldPlayback";
+import { useKeyboardControls } from "../hooks/useKeyboardControls";
+import { useReaderState } from "../hooks/useReaderState";
 import "./App.css";
 
 function App() {
-  const [words, setWords] = useState<string[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [fileName, setFileName] = useState("");
   const [hasLoadedFile, setHasLoadedFile] = useState(false);
+  const {
+    words,
+    currentIndex,
+    wpm,
+    isHolding,
+    loadText,
+    nextWord,
+    previousWord,
+    reset,
+    setWpm,
+    setHolding,
+  } = useReaderState();
 
   const handleTextLoaded = (text: string, loadedFileName: string) => {
-    setWords(tokenizeText(text));
-    setCurrentIndex(0);
+    loadText(text);
     setFileName(loadedFileName);
     setHasLoadedFile(true);
   };
 
-  const goToPreviousWord = () => {
-    setCurrentIndex((index) => Math.max(0, index - 1));
-  };
-
-  const goToNextWord = () => {
-    setCurrentIndex((index) => Math.min(words.length - 1, index + 1));
-  };
-
-  const resetReader = () => {
-    setCurrentIndex(0);
-  };
-
   const canGoPrevious = words.length > 0 && currentIndex > 0;
   const canGoNext = words.length > 0 && currentIndex < words.length - 1;
+
+  useKeyboardControls({
+    hasWords: words.length > 0,
+    onHoldingChange: setHolding,
+    onNext: nextWord,
+    onPrevious: previousWord,
+  });
+
+  useHoldPlayback({
+    isHolding,
+    wpm,
+    canAdvance: canGoNext,
+    onAdvance: nextWord,
+    onStop: () => setHolding(false),
+  });
 
   return (
     <main className="app-shell">
@@ -61,11 +75,15 @@ function App() {
         />
 
         <ReaderControls
+          hasWords={words.length > 0}
           canGoPrevious={canGoPrevious}
           canGoNext={canGoNext}
-          onPrevious={goToPreviousWord}
-          onNext={goToNextWord}
-          onReset={resetReader}
+          isHolding={isHolding}
+          wpm={wpm}
+          onPrevious={previousWord}
+          onNext={nextWord}
+          onReset={reset}
+          onWpmChange={setWpm}
         />
 
         <FileLoader onTextLoaded={handleTextLoaded} />
