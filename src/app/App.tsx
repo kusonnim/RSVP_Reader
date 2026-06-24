@@ -132,7 +132,9 @@ function App() {
   ]);
 
   return (
-    <div className={`app theme-${theme}`}>
+    <div
+      className={`app theme-${theme}${hasLoadedFile ? " has-document" : ""}`}
+    >
       <main className="app-shell">
         <header className="app-header">
           <a className="wordmark" href="/" aria-label="Hold-to-Read home">
@@ -147,12 +149,14 @@ function App() {
         </header>
 
         <section className="welcome-panel" aria-labelledby="welcome-title">
-          <p className="eyebrow">Read at the speed of focus</p>
-          <h1 id="welcome-title">Your words, one clear moment at a time.</h1>
-          <p className="welcome-copy">
-            A focused RSVP reader that keeps your text moving while you hold
-            the space bar.
-          </p>
+          <div className="intro">
+            <p className="eyebrow">Read at the speed of focus</p>
+            <h1 id="welcome-title">Your words, one clear moment at a time.</h1>
+            <p className="welcome-copy">
+              A focused RSVP reader that keeps your text moving while you hold
+              the space bar.
+            </p>
+          </div>
 
           <ReaderView
             words={words}

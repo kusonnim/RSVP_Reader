@@ -3,14 +3,16 @@
 }
 
 html {
+  height: 100%;
   min-width: 20rem;
   background: var(--color-background);
 }
 
 body {
+  height: 100%;
   min-width: 20rem;
-  min-height: 100vh;
   margin: 0;
+  overflow: hidden;
   color: var(--color-text);
   background: var(--color-background);
   font-family:
@@ -21,6 +23,10 @@ body {
   transition:
     color 180ms ease,
     background-color 180ms ease;
+}
+
+#root {
+  height: 100%;
 }
 
 button,
