@@ -12,7 +12,7 @@ function ReaderView({ words, currentIndex, isHolding }: ReaderViewProps) {
       <section className="reader-view reader-view-empty" aria-live="polite">
         <p className="reader-empty-title">Ready when you are.</p>
         <p className="reader-empty-copy">
-          Choose a TXT file to place its first word here.
+          Choose a TXT or EPUB file to place its first word here.
         </p>
       </section>
     );

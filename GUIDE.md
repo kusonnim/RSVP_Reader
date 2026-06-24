@@ -401,13 +401,12 @@ Do not implement yet:
 
 ## EPUB Parser
 
-Add later:
-
 ```text
 lib/parseEpubFile.ts
 ```
 
-It should output plain text and reuse the existing `tokenizeText` function.
+It outputs plain text in spine order and reuses the existing `tokenizeText`
+function.
 
 ---
 
