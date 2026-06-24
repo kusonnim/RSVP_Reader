@@ -34,14 +34,24 @@ function ReaderView({ words, currentIndex, isHolding }: ReaderViewProps) {
         preserveAspectRatio="none"
         aria-hidden="true"
       >
-        <path
+        <rect
           className="reader-progress-track"
-          d="M 50 1 H 96 A 3 3 0 0 1 99 4 V 96 A 3 3 0 0 1 96 99 H 4 A 3 3 0 0 1 1 96 V 4 A 3 3 0 0 1 4 1 H 50"
+          x="1"
+          y="1"
+          width="98"
+          height="98"
+          rx="4"
+          ry="4"
           pathLength="100"
         />
-        <path
+        <rect
           className="reader-progress-fill"
-          d="M 50 1 H 96 A 3 3 0 0 1 99 4 V 96 A 3 3 0 0 1 96 99 H 4 A 3 3 0 0 1 1 96 V 4 A 3 3 0 0 1 4 1 H 50"
+          x="1"
+          y="1"
+          width="98"
+          height="98"
+          rx="4"
+          ry="4"
           pathLength="100"
           strokeDasharray="100"
           strokeDashoffset={100 - progress}
