@@ -1,5 +1,7 @@
 import { useState } from "react";
 import FileLoader from "../components/FileLoader";
+import ProgressBar from "../components/ProgressBar";
+import ReaderControls from "../components/ReaderControls";
 import ReaderView from "../components/ReaderView";
 import { tokenizeText } from "../lib/tokenizeText";
 import "./App.css";
@@ -16,6 +18,21 @@ function App() {
     setFileName(loadedFileName);
     setHasLoadedFile(true);
   };
+
+  const goToPreviousWord = () => {
+    setCurrentIndex((index) => Math.max(0, index - 1));
+  };
+
+  const goToNextWord = () => {
+    setCurrentIndex((index) => Math.min(words.length - 1, index + 1));
+  };
+
+  const resetReader = () => {
+    setCurrentIndex(0);
+  };
+
+  const canGoPrevious = words.length > 0 && currentIndex > 0;
+  const canGoNext = words.length > 0 && currentIndex < words.length - 1;
 
   return (
     <main className="app-shell">
@@ -37,6 +54,19 @@ function App() {
         </p>
 
         <ReaderView words={words} currentIndex={currentIndex} />
+
+        <ProgressBar
+          currentIndex={currentIndex}
+          totalWords={words.length}
+        />
+
+        <ReaderControls
+          canGoPrevious={canGoPrevious}
+          canGoNext={canGoNext}
+          onPrevious={goToPreviousWord}
+          onNext={goToNextWord}
+          onReset={resetReader}
+        />
 
         <FileLoader onTextLoaded={handleTextLoaded} />
 

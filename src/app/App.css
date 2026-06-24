@@ -123,10 +123,84 @@
   line-height: 1.5;
 }
 
+.progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(100%, 44rem);
+  margin-top: 1rem;
+}
+
+.progress-track {
+  height: 0.375rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-border);
+}
+
+.progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+  transition: width 180ms ease;
+}
+
+.progress-label {
+  min-width: 5.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.reader-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.control-button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-weight: 700;
+  transition:
+    border-color 150ms ease,
+    transform 150ms ease,
+    opacity 150ms ease;
+}
+
+.control-button:hover:not(:disabled) {
+  border-color: var(--color-text-subtle);
+  transform: translateY(-0.125rem);
+}
+
+.control-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.control-button-reset {
+  color: var(--color-text-muted);
+  background: transparent;
+}
+
 .file-loader {
   display: grid;
   justify-items: center;
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
 }
 
 .file-loader-button {
@@ -199,5 +273,16 @@
   .reader-context {
     grid-template-columns: 0.7fr 0.8fr minmax(6.5rem, 2fr) 0.8fr 0.7fr;
     padding: 1rem 0.5rem;
+  }
+
+  .reader-controls {
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .control-button {
+    flex: 1;
+    padding-inline: 0.6rem;
+    font-size: 0.85rem;
   }
 }
