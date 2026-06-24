@@ -399,6 +399,7 @@ Implement:
 * touch-and-hold playback
 * a large mobile-friendly hold target
 * preserve keyboard controls on desktop
+* stop playback on release, cancellation, or lost pointer capture
 
 ---
 

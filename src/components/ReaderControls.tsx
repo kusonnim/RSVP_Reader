@@ -1,3 +1,5 @@
+import HoldToReadButton from "./HoldToReadButton";
+
 type ReaderControlsProps = {
   hasWords: boolean;
   canGoPrevious: boolean;
@@ -8,6 +10,7 @@ type ReaderControlsProps = {
   onNext: () => void;
   onReset: () => void;
   onWpmChange: (wpm: number) => void;
+  onHoldingChange: (isHolding: boolean) => void;
 };
 
 function ReaderControls({
@@ -20,6 +23,7 @@ function ReaderControls({
   onNext,
   onReset,
   onWpmChange,
+  onHoldingChange,
 }: ReaderControlsProps) {
   return (
     <div className="controls-panel">
@@ -39,6 +43,13 @@ function ReaderControls({
           <output htmlFor="wpm">{wpm} WPM</output>
         </div>
       </div>
+
+      <HoldToReadButton
+        canRead={canGoNext}
+        hasWords={hasWords}
+        isHolding={isHolding}
+        onHoldingChange={onHoldingChange}
+      />
 
       <div className="reader-controls" aria-label="Reader controls">
         <button

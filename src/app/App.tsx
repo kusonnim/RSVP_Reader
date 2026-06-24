@@ -181,6 +181,7 @@ function App() {
             onNext={nextWord}
             onReset={reset}
             onWpmChange={setWpm}
+            onHoldingChange={setHolding}
           />
 
           <FileLoader onDocumentLoaded={handleDocumentLoaded} />
