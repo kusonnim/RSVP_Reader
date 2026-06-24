@@ -28,7 +28,9 @@ function ReaderControls({
   return (
     <div className="controls-panel">
       <div className="speed-control">
-        <label htmlFor="wpm">Reading speed</label>
+        <label className="visually-hidden" htmlFor="wpm">
+          Reading speed
+        </label>
         <div className="speed-input-row">
           <input
             id="wpm"
@@ -57,25 +59,29 @@ function ReaderControls({
           type="button"
           onClick={onPrevious}
           disabled={!canGoPrevious}
+          aria-label="Previous word"
+          title="Previous word"
         >
           <span aria-hidden="true">&larr;</span>
-          Previous
         </button>
         <button
           className="control-button control-button-reset"
           type="button"
           onClick={onReset}
           disabled={!canGoPrevious}
+          aria-label="Reset to first word"
+          title="Reset"
         >
-          Reset
+          <span aria-hidden="true">&#8634;</span>
         </button>
         <button
           className="control-button"
           type="button"
           onClick={onNext}
           disabled={!canGoNext}
+          aria-label="Next word"
+          title="Next word"
         >
-          Next
           <span aria-hidden="true">&rarr;</span>
         </button>
       </div>

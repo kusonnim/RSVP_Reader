@@ -62,8 +62,10 @@ function FileLoader({ onDocumentLoaded }: FileLoaderProps) {
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={isLoading}
+        aria-label={isLoading ? "Opening file" : "Open TXT or EPUB file"}
+        title={isLoading ? "Opening file" : "Open file"}
       >
-        {isLoading ? "Opening..." : "Open file"}
+        <span aria-hidden="true">{isLoading ? "…" : "+"}</span>
       </button>
       {error && (
         <p id="file-loader-error" className="file-loader-error" role="alert">

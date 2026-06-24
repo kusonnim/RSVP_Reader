@@ -17,7 +17,9 @@ function ChapterSelector({
 
   return (
     <div className="chapter-selector">
-      <label htmlFor="chapter">Chapter</label>
+      <label className="visually-hidden" htmlFor="chapter">
+        Chapter
+      </label>
       <select
         id="chapter"
         value={selectedIndex}
@@ -30,11 +32,10 @@ function ChapterSelector({
         ))}
       </select>
       <span>
-        {selectedIndex + 1} of {chapters.length}
+        {selectedIndex + 1}/{chapters.length}
       </span>
     </div>
   );
 }
 
 export default ChapterSelector;
-

@@ -28,7 +28,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  border-bottom: 1px solid var(--color-border);
   padding-bottom: 0.65rem;
 }
 
@@ -41,10 +40,10 @@
 .theme-selector {
   display: flex;
   gap: 0.25rem;
-  border: 1px solid var(--color-border);
+  border: 0;
   border-radius: 999px;
   padding: 0.25rem;
-  background: var(--color-surface);
+  background: transparent;
 }
 
 .theme-option {
@@ -74,7 +73,8 @@
 
 .theme-option.is-selected {
   color: var(--color-text);
-  background: var(--color-background);
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
 .theme-swatch {
@@ -107,7 +107,7 @@
   display: grid;
   align-content: center;
   justify-items: center;
-  gap: clamp(0.4rem, 1vh, 0.7rem);
+  gap: 0;
   max-width: 48rem;
   width: 100%;
   min-height: 0;
@@ -198,18 +198,17 @@
 
 .chapter-selector {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.75rem;
   width: min(100%, 40rem);
-  margin-top: 0;
-  border: 1px solid var(--color-border);
-  border-radius: 0.9rem;
-  padding: 0.5rem 0.75rem;
-  background: var(--color-surface);
+  margin-top: -1px;
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.5rem 0.85rem;
+  background: transparent;
 }
 
-.chapter-selector label,
 .chapter-selector span {
   color: var(--color-text-muted);
   font-size: 0.8rem;
@@ -222,7 +221,8 @@
   color: var(--color-text);
   background: transparent;
   cursor: pointer;
-  font-weight: 700;
+  font-size: 0.8rem;
+  font-weight: 650;
   text-overflow: ellipsis;
 }
 
@@ -278,13 +278,15 @@
   display: grid;
   justify-items: center;
   width: min(100%, 40rem);
-  margin-top: 0;
+  margin-top: 0.35rem;
 }
 
 .speed-control {
   display: grid;
-  width: min(100%, 28rem);
+  width: 100%;
   gap: 0.25rem;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.35rem 0.85rem 0.55rem;
   text-align: left;
 }
 
@@ -296,7 +298,7 @@
 
 .speed-input-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 5.5rem;
+  grid-template-columns: minmax(0, 1fr) 4.5rem;
   align-items: center;
   gap: 0.75rem;
 }
@@ -308,8 +310,8 @@
 }
 
 .speed-input-row output {
-  color: var(--color-text);
-  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   font-weight: 750;
   text-align: right;
@@ -361,21 +363,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  margin-top: 0.65rem;
+  gap: 1.25rem;
+  margin-top: 0.4rem;
 }
 
 .control-button {
   display: inline-flex;
-  min-height: 3rem;
+  width: 2.5rem;
+  min-height: 2.5rem;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  padding: 0.65rem 1rem;
-  color: var(--color-text);
-  background: var(--color-surface);
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  color: var(--color-text-muted);
+  background: transparent;
   cursor: pointer;
   font-weight: 700;
   transition:
@@ -385,14 +388,15 @@
 }
 
 .control-button:hover:not(:disabled) {
-  border-color: var(--color-text-subtle);
-  transform: translateY(-0.125rem);
+  color: var(--color-text);
+  background: var(--color-surface);
+  transform: scale(1.06);
 }
 
 .control-button:disabled {
   cursor: not-allowed;
   color: var(--color-text-subtle);
-  background: color-mix(in srgb, var(--color-surface) 65%, transparent);
+  background: transparent;
   opacity: 0.55;
 }
 
@@ -405,18 +409,16 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0.55rem 0 0;
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
+  margin: 0.2rem 0 0;
+  color: var(--color-text-subtle);
+  font-size: 0.75rem;
 }
 
 .hold-instruction kbd {
-  border: 1px solid var(--color-border);
-  border-bottom-width: 0.2rem;
-  border-radius: 0.4rem;
-  padding: 0.2rem 0.5rem;
-  color: var(--color-text);
-  background: var(--color-surface);
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
   font-family: inherit;
   font-size: 0.75rem;
   font-weight: 800;
@@ -435,15 +437,16 @@
 }
 
 .file-loader-button {
-  min-height: 2.25rem;
+  width: 2rem;
+  min-height: 2rem;
   border: 1px solid var(--color-border);
-  border-radius: 999px;
-  padding: 0.35rem 0.75rem;
+  border-radius: 50%;
+  padding: 0;
   color: var(--color-text);
   background: var(--color-surface);
   cursor: pointer;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 500;
   transition:
     transform 150ms ease,
     opacity 150ms ease;
@@ -541,13 +544,8 @@
     grid-template-columns: 1fr auto;
   }
 
-  .chapter-selector label {
-    grid-column: 1 / -1;
-    text-align: left;
-  }
-
   .speed-input-row {
-    grid-template-columns: minmax(0, 1fr) 5rem;
+    grid-template-columns: minmax(0, 1fr) 4.5rem;
     gap: 0.5rem;
   }
 
@@ -557,13 +555,14 @@
 
   .reader-controls {
     width: 100%;
-    gap: 0.35rem;
+    gap: 1rem;
   }
 
   .control-button {
+    width: 2.25rem;
     min-height: 2.35rem;
-    flex: 0 1 auto;
-    padding: 0.35rem 0.7rem;
+    flex: 0 0 auto;
+    padding: 0;
     font-size: 0.78rem;
   }
 
@@ -580,8 +579,8 @@
   }
 
   .control-button {
-    flex: 1;
-    padding-inline: 0.35rem;
+    flex: 0 0 auto;
+    padding: 0;
   }
 }
 
@@ -596,7 +595,7 @@
 
   .control-button {
     min-height: 2.5rem;
-    padding-block: 0.45rem;
+    padding: 0;
   }
 
   .hold-instruction {
@@ -610,7 +609,7 @@
   }
 
   .reader-panel {
-    gap: 0.35rem;
+    gap: 0;
   }
 
   .reader-view {
