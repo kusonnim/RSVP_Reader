@@ -122,7 +122,7 @@
   min-height: clamp(8rem, 24vh, 12rem);
   margin-top: 0;
   place-items: center;
-  border: 1px solid var(--color-border);
+  border: 0;
   border-radius: 1rem;
   background: var(--color-surface);
   box-shadow: none;
@@ -147,8 +147,45 @@
     background-color 180ms ease;
 }
 
+.reader-progress-outline {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.reader-progress-track,
+.reader-progress-fill {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.reader-progress-track {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.reader-progress-fill {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 180ms ease;
+}
+
+.reader-progress-label {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.65rem;
+  z-index: 2;
+  color: var(--color-text-subtle);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .reader-view.is-reading {
-  border-color: var(--color-accent);
   box-shadow: 0 0 0 0.2rem
     color-mix(in srgb, var(--color-accent) 12%, transparent);
   transform: translateY(-0.125rem);
@@ -220,6 +257,7 @@
 .reader-view-empty {
   align-content: center;
   padding: 1.25rem;
+  box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
 .reader-empty-title {
@@ -234,38 +272,6 @@
   margin: 0.5rem 0 0;
   color: var(--color-text-muted);
   line-height: 1.5;
-}
-
-.progress {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.75rem;
-  width: min(100%, 40rem);
-  margin-top: 0;
-}
-
-.progress-track {
-  height: 0.375rem;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--color-border);
-}
-
-.progress-fill {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--color-accent);
-  transition: width 180ms ease;
-}
-
-.progress-label {
-  min-width: 5.5rem;
-  color: var(--color-text-muted);
-  font-size: 0.8rem;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
 }
 
 .controls-panel {
@@ -531,11 +537,6 @@
     padding: 1rem 0.5rem;
   }
 
-  .progress {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 0.5rem;
-  }
-
   .chapter-selector {
     grid-template-columns: 1fr auto;
   }
@@ -543,11 +544,6 @@
   .chapter-selector label {
     grid-column: 1 / -1;
     text-align: left;
-  }
-
-  .progress-label {
-    min-width: 4.5rem;
-    text-align: right;
   }
 
   .speed-input-row {

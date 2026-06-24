@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import ChapterSelector from "../components/ChapterSelector";
 import FileLoader from "../components/FileLoader";
-import ProgressBar from "../components/ProgressBar";
 import ReaderControls from "../components/ReaderControls";
 import ReaderView from "../components/ReaderView";
 import ThemeSelector from "../components/ThemeSelector";
@@ -142,11 +141,6 @@ function App() {
             chapters={chapters}
             selectedIndex={selectedChapterIndex}
             onChapterChange={handleChapterChange}
-          />
-
-          <ProgressBar
-            currentIndex={currentIndex}
-            totalWords={words.length}
           />
 
           <ReaderControls
