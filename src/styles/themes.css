@@ -1,0 +1,43 @@
+:root,
+.theme-light {
+  color-scheme: light;
+  --color-background: #f5f3ee;
+  --color-surface: #fffefa;
+  --color-text: #191918;
+  --color-text-muted: #62615d;
+  --color-text-subtle: #8a8881;
+  --color-border: #dedbd2;
+  --color-accent: #e05b36;
+  --color-focus: #b33a1d;
+  --shadow-soft: 0 1.5rem 4rem rgb(37 31 22 / 8%);
+  --radius-large: 1.5rem;
+}
+
+.theme-dark {
+  color-scheme: dark;
+  --color-background: #151614;
+  --color-surface: #1e201d;
+  --color-text: #f4f2eb;
+  --color-text-muted: #b5b5ad;
+  --color-text-subtle: #85877f;
+  --color-border: #343732;
+  --color-accent: #ff805d;
+  --color-focus: #ff9b7f;
+  --shadow-soft: 0 1.5rem 4rem rgb(0 0 0 / 24%);
+  --radius-large: 1.5rem;
+}
+
+.theme-sepia {
+  color-scheme: light;
+  --color-background: #eee3cc;
+  --color-surface: #f8eed9;
+  --color-text: #34281d;
+  --color-text-muted: #746351;
+  --color-text-subtle: #998775;
+  --color-border: #d8c7aa;
+  --color-accent: #a6502f;
+  --color-focus: #78351e;
+  --shadow-soft: 0 1.5rem 4rem rgb(74 51 27 / 10%);
+  --radius-large: 1.5rem;
+}
+
