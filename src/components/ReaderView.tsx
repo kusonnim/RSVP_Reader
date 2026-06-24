@@ -1,11 +1,12 @@
 type ReaderViewProps = {
   words: string[];
   currentIndex: number;
+  isHolding: boolean;
 };
 
 const contextOffsets = [-2, -1, 0, 1, 2];
 
-function ReaderView({ words, currentIndex }: ReaderViewProps) {
+function ReaderView({ words, currentIndex, isHolding }: ReaderViewProps) {
   if (words.length === 0) {
     return (
       <section className="reader-view reader-view-empty" aria-live="polite">
@@ -19,7 +20,7 @@ function ReaderView({ words, currentIndex }: ReaderViewProps) {
 
   return (
     <section
-      className="reader-view"
+      className={`reader-view${isHolding ? " is-reading" : ""}`}
       aria-label="Reader"
       aria-live="polite"
       aria-atomic="true"
@@ -47,4 +48,3 @@ function ReaderView({ words, currentIndex }: ReaderViewProps) {
 }
 
 export default ReaderView;
-

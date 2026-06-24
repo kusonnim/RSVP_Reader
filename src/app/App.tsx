@@ -74,7 +74,11 @@ function App() {
             the space bar.
           </p>
 
-          <ReaderView words={words} currentIndex={currentIndex} />
+          <ReaderView
+            words={words}
+            currentIndex={currentIndex}
+            isHolding={isHolding}
+          />
 
           <ProgressBar
             currentIndex={currentIndex}
