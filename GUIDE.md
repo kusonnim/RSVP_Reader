@@ -348,6 +348,40 @@ Add:
 
 ---
 
+## Step 8: Persistence
+
+Implement:
+
+* remember theme
+* remember WPM
+* remember current index
+* remember last file metadata
+* restore progress when the same file is loaded again
+
+Use browser local storage.
+
+---
+
+## Step 9: EPUB Support
+
+Implement:
+
+* accept `.epub` files
+* extract plain text in the browser
+* reuse the existing `tokenizeText` function
+
+---
+
+## Step 10: Smart Timing
+
+Implement punctuation-aware playback timing:
+
+* pause longer after sentence-ending punctuation
+* pause slightly after commas and similar punctuation
+* optionally give long words extra display time
+
+---
+
 # Non-Goals for MVP
 
 Do not implement yet:

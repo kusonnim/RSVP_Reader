@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FileLoader from "../components/FileLoader";
 import ProgressBar from "../components/ProgressBar";
 import ReaderControls from "../components/ReaderControls";
@@ -6,12 +6,26 @@ import ReaderView from "../components/ReaderView";
 import ThemeSelector from "../components/ThemeSelector";
 import { useHoldPlayback } from "../hooks/useHoldPlayback";
 import { useKeyboardControls } from "../hooks/useKeyboardControls";
+import { useReaderPersistence } from "../hooks/useReaderPersistence";
 import { useReaderState } from "../hooks/useReaderState";
+import type { ReaderFileMetadata } from "../types/reader";
 import "./App.css";
 
 function App() {
   const [fileName, setFileName] = useState("");
   const [hasLoadedFile, setHasLoadedFile] = useState(false);
+  const [restoredWordNumber, setRestoredWordNumber] = useState<number | null>(
+    null,
+  );
+  const [fileMetadata, setFileMetadata] =
+    useState<ReaderFileMetadata | null>(null);
+  const {
+    initialTheme,
+    initialWpm,
+    getRestoredIndex,
+    savePreferences,
+    saveProgress,
+  } = useReaderPersistence();
   const {
     words,
     currentIndex,
@@ -25,12 +39,22 @@ function App() {
     setWpm,
     setHolding,
     setTheme,
-  } = useReaderState();
+  } = useReaderState({ theme: initialTheme, wpm: initialWpm });
 
-  const handleTextLoaded = (text: string, loadedFileName: string) => {
-    loadText(text);
-    setFileName(loadedFileName);
+  const handleTextLoaded = (text: string, file: File) => {
+    const metadata: ReaderFileMetadata = {
+      name: file.name,
+      size: file.size,
+      lastModified: file.lastModified,
+    };
+
+    const restoredIndex = getRestoredIndex(metadata);
+
+    loadText(text, restoredIndex);
+    setFileName(file.name);
+    setFileMetadata(metadata);
     setHasLoadedFile(true);
+    setRestoredWordNumber(restoredIndex > 0 ? restoredIndex + 1 : null);
   };
 
   const canGoPrevious = words.length > 0 && currentIndex > 0;
@@ -50,6 +74,16 @@ function App() {
     onAdvance: nextWord,
     onStop: () => setHolding(false),
   });
+
+  useEffect(() => {
+    savePreferences(theme, wpm);
+  }, [savePreferences, theme, wpm]);
+
+  useEffect(() => {
+    if (fileMetadata && words.length > 0) {
+      saveProgress(currentIndex, fileMetadata);
+    }
+  }, [currentIndex, fileMetadata, saveProgress, words.length]);
 
   return (
     <div className={`app theme-${theme}`}>
@@ -102,7 +136,9 @@ function App() {
           {hasLoadedFile && (
             <p className="load-result" role="status">
               {words.length > 0
-                ? `${fileName} is ready with ${words.length.toLocaleString()} words.`
+                ? restoredWordNumber
+                  ? `${fileName} resumed at word ${restoredWordNumber.toLocaleString()}.`
+                  : `${fileName} is ready with ${words.length.toLocaleString()} words.`
                 : `${fileName} did not contain any readable words.`}
             </p>
           )}

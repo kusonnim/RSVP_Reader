@@ -2,7 +2,7 @@ import { type ChangeEvent, useRef, useState } from "react";
 import { parseTxtFile } from "../lib/parseTxtFile";
 
 type FileLoaderProps = {
-  onTextLoaded: (text: string, fileName: string) => void;
+  onTextLoaded: (text: string, file: File) => void;
 };
 
 function FileLoader({ onTextLoaded }: FileLoaderProps) {
@@ -29,7 +29,7 @@ function FileLoader({ onTextLoaded }: FileLoaderProps) {
 
     try {
       const text = await parseTxtFile(file);
-      onTextLoaded(text, file.name);
+      onTextLoaded(text, file);
     } catch {
       setError("That file could not be read. Please try another TXT file.");
     } finally {
@@ -69,4 +69,3 @@ function FileLoader({ onTextLoaded }: FileLoaderProps) {
 }
 
 export default FileLoader;
-

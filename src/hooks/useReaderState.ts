@@ -6,20 +6,30 @@ const DEFAULT_WPM = 300;
 const MIN_WPM = 100;
 const MAX_WPM = 1000;
 
-export function useReaderState() {
+type InitialReaderPreferences = {
+  theme?: ReaderTheme;
+  wpm?: number;
+};
+
+export function useReaderState(initialPreferences: InitialReaderPreferences = {}) {
   const [state, setState] = useState<ReaderState>({
     words: [],
     currentIndex: 0,
-    wpm: DEFAULT_WPM,
+    wpm: initialPreferences.wpm ?? DEFAULT_WPM,
     isHolding: false,
-    theme: "light",
+    theme: initialPreferences.theme ?? "light",
   });
 
-  const loadText = useCallback((text: string) => {
+  const loadText = useCallback((text: string, restoredIndex = 0) => {
+    const words = tokenizeText(text);
+
     setState((current) => ({
       ...current,
-      words: tokenizeText(text),
-      currentIndex: 0,
+      words,
+      currentIndex:
+        words.length > 0
+          ? Math.min(Math.max(0, restoredIndex), words.length - 1)
+          : 0,
       isHolding: false,
     }));
   }, []);
