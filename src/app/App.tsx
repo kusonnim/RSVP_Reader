@@ -17,11 +17,6 @@ import type {
 import "./App.css";
 
 function App() {
-  const [fileName, setFileName] = useState("");
-  const [hasLoadedFile, setHasLoadedFile] = useState(false);
-  const [restoredWordNumber, setRestoredWordNumber] = useState<number | null>(
-    null,
-  );
   const [fileMetadata, setFileMetadata] =
     useState<ReaderFileMetadata | null>(null);
   const [chapters, setChapters] = useState<ReaderChapter[]>([]);
@@ -72,16 +67,9 @@ function App() {
         : document.text;
 
     loadText(text, restoredProgress.currentIndex);
-    setFileName(file.name);
     setFileMetadata(metadata);
     setChapters(document.chapters);
     setSelectedChapterIndex(chapterIndex);
-    setHasLoadedFile(true);
-    setRestoredWordNumber(
-      restoredProgress.currentIndex > 0
-        ? restoredProgress.currentIndex + 1
-        : null,
-    );
   };
 
   const handleChapterChange = (chapterIndex: number) => {
@@ -92,7 +80,6 @@ function App() {
     }
 
     setSelectedChapterIndex(chapterIndex);
-    setRestoredWordNumber(null);
     loadText(chapter.text);
   };
 
@@ -132,32 +119,19 @@ function App() {
   ]);
 
   return (
-    <div
-      className={`app theme-${theme}${hasLoadedFile ? " has-document" : ""}`}
-    >
+    <div className={`app theme-${theme}`}>
       <main className="app-shell">
         <header className="app-header">
-          <a className="wordmark" href="/" aria-label="Hold-to-Read home">
+          <span className="wordmark">
             Hold-to-Read
-          </a>
+          </span>
           <div className="header-actions">
+            <FileLoader onDocumentLoaded={handleDocumentLoaded} />
             <ThemeSelector theme={theme} onThemeChange={setTheme} />
-            <span className="status-badge">
-              {hasLoadedFile ? `${words.length} words` : "Reader setup"}
-            </span>
           </div>
         </header>
 
-        <section className="welcome-panel" aria-labelledby="welcome-title">
-          <div className="intro">
-            <p className="eyebrow">Read at the speed of focus</p>
-            <h1 id="welcome-title">Your words, one clear moment at a time.</h1>
-            <p className="welcome-copy">
-              A focused RSVP reader that keeps your text moving while you hold
-              the space bar.
-            </p>
-          </div>
-
+        <section className="reader-panel" aria-label="Hold-to-Read reader">
           <ReaderView
             words={words}
             currentIndex={currentIndex}
@@ -187,18 +161,6 @@ function App() {
             onWpmChange={setWpm}
             onHoldingChange={setHolding}
           />
-
-          <FileLoader onDocumentLoaded={handleDocumentLoaded} />
-
-          {hasLoadedFile && (
-            <p className="load-result" role="status">
-              {words.length > 0
-                ? restoredWordNumber
-                  ? `${fileName} resumed at word ${restoredWordNumber.toLocaleString()}.`
-                  : `${fileName} is ready with ${words.length.toLocaleString()} words.`
-                : `${fileName} did not contain any readable words.`}
-            </p>
-          )}
         </section>
       </main>
     </div>

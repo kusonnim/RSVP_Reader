@@ -55,7 +55,7 @@ function FileLoader({ onDocumentLoaded }: FileLoaderProps) {
         type="file"
         accept=".txt,.epub,text/plain,application/epub+zip"
         onChange={handleFileChange}
-        aria-describedby={error ? "file-loader-error" : "file-loader-help"}
+        aria-describedby={error ? "file-loader-error" : undefined}
       />
       <button
         className="file-loader-button"
@@ -63,11 +63,8 @@ function FileLoader({ onDocumentLoaded }: FileLoaderProps) {
         onClick={() => inputRef.current?.click()}
         disabled={isLoading}
       >
-        {isLoading ? "Reading file..." : "Choose a TXT or EPUB file"}
+        {isLoading ? "Opening..." : "Open file"}
       </button>
-      <p id="file-loader-help" className="file-loader-help">
-        Your TXT or EPUB stays in this browser.
-      </p>
       {error && (
         <p id="file-loader-error" className="file-loader-error" role="alert">
           {error}

@@ -31,7 +31,7 @@ function ThemeSelector({ theme, onThemeChange }: ThemeSelectorProps) {
             onChange={() => onThemeChange(option.value)}
           />
           <span className={`theme-swatch theme-swatch-${option.value}`} />
-          <span>{option.label}</span>
+          <span className="visually-hidden">{option.label}</span>
         </label>
       ))}
     </fieldset>
@@ -39,4 +39,3 @@ function ThemeSelector({ theme, onThemeChange }: ThemeSelectorProps) {
 }
 
 export default ThemeSelector;
-

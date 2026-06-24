@@ -85,23 +85,8 @@ function ReaderControls({
         {isHolding
           ? " Reading..."
           : hasWords
-            ? " Hold to read"
-            : " Load text to begin"}
-      </p>
-
-      <div className="keyboard-help" aria-label="Keyboard shortcuts">
-        <span>
-          <kbd>&larr;</kbd>
-          Previous
-        </span>
-        <span>
-          <kbd>&rarr;</kbd>
-          Next
-        </span>
-        <span>Space pauses when released</span>
-      </div>
-      <p className="smart-timing-note">
-        Smart pacing adds time for punctuation and longer words.
+            ? " Hold"
+            : " Open a file"}
       </p>
     </div>
   );
