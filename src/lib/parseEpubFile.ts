@@ -1,4 +1,5 @@
 import JSZip from "jszip";
+import type { LoadedReaderDocument, ReaderChapter } from "../types/reader";
 
 const CONTAINER_PATH = "META-INF/container.xml";
 
@@ -46,17 +47,22 @@ function resolveArchivePath(baseFilePath: string, relativePath: string): string 
   return normalizeArchivePath(`${baseDirectory}${decodedPath}`);
 }
 
-function extractReadableText(markup: string): string {
+function extractChapter(markup: string, id: string, index: number): ReaderChapter {
   const document = new DOMParser().parseFromString(markup, "text/html");
 
   document
     .querySelectorAll("script, style, svg, noscript")
     .forEach((element) => element.remove());
 
-  return document.body?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+  const text = document.body?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+  const heading = document.querySelector("h1, h2, h3, title");
+  const title =
+    heading?.textContent?.replace(/\s+/g, " ").trim() || `Chapter ${index + 1}`;
+
+  return { id, title, text };
 }
 
-export async function parseEpubFile(file: File): Promise<string> {
+export async function parseEpubFile(file: File): Promise<LoadedReaderDocument> {
   const archive = await JSZip.loadAsync(file);
   const containerEntry = archive.file(CONTAINER_PATH);
 
@@ -95,7 +101,7 @@ export async function parseEpubFile(file: File): Promise<string> {
     }),
   );
   const spineItems = getElementsByLocalName(packageDocument, "itemref");
-  const chapterTexts: string[] = [];
+  const chapters: ReaderChapter[] = [];
 
   for (const spineItem of spineItems) {
     const id = spineItem.getAttribute("idref");
@@ -112,17 +118,23 @@ export async function parseEpubFile(file: File): Promise<string> {
       continue;
     }
 
-    const chapterText = extractReadableText(await chapterEntry.async("text"));
+    const chapter = extractChapter(
+      await chapterEntry.async("text"),
+      chapterPath,
+      chapters.length,
+    );
 
-    if (chapterText) {
-      chapterTexts.push(chapterText);
+    if (chapter.text) {
+      chapters.push(chapter);
     }
   }
 
-  if (chapterTexts.length === 0) {
+  if (chapters.length === 0) {
     throw new Error("No readable spine content was found in the EPUB.");
   }
 
-  return chapterTexts.join("\n\n");
+  return {
+    text: chapters.map((chapter) => chapter.text).join("\n\n"),
+    chapters,
+  };
 }
-

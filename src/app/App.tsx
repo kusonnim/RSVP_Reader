@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ChapterSelector from "../components/ChapterSelector";
 import FileLoader from "../components/FileLoader";
 import ProgressBar from "../components/ProgressBar";
 import ReaderControls from "../components/ReaderControls";
@@ -8,7 +9,11 @@ import { useHoldPlayback } from "../hooks/useHoldPlayback";
 import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import { useReaderPersistence } from "../hooks/useReaderPersistence";
 import { useReaderState } from "../hooks/useReaderState";
-import type { ReaderFileMetadata } from "../types/reader";
+import type {
+  LoadedReaderDocument,
+  ReaderChapter,
+  ReaderFileMetadata,
+} from "../types/reader";
 import "./App.css";
 
 function App() {
@@ -19,10 +24,12 @@ function App() {
   );
   const [fileMetadata, setFileMetadata] =
     useState<ReaderFileMetadata | null>(null);
+  const [chapters, setChapters] = useState<ReaderChapter[]>([]);
+  const [selectedChapterIndex, setSelectedChapterIndex] = useState(0);
   const {
     initialTheme,
     initialWpm,
-    getRestoredIndex,
+    getRestoredProgress,
     savePreferences,
     saveProgress,
   } = useReaderPersistence();
@@ -41,20 +48,52 @@ function App() {
     setTheme,
   } = useReaderState({ theme: initialTheme, wpm: initialWpm });
 
-  const handleTextLoaded = (text: string, file: File) => {
+  const handleDocumentLoaded = (
+    document: LoadedReaderDocument,
+    file: File,
+  ) => {
     const metadata: ReaderFileMetadata = {
       name: file.name,
       size: file.size,
       lastModified: file.lastModified,
     };
 
-    const restoredIndex = getRestoredIndex(metadata);
+    const restoredProgress = getRestoredProgress(metadata);
+    const chapterIndex =
+      document.chapters.length > 0
+        ? Math.min(
+            restoredProgress.chapterIndex,
+            document.chapters.length - 1,
+          )
+        : 0;
+    const text =
+      document.chapters.length > 0
+        ? document.chapters[chapterIndex].text
+        : document.text;
 
-    loadText(text, restoredIndex);
+    loadText(text, restoredProgress.currentIndex);
     setFileName(file.name);
     setFileMetadata(metadata);
+    setChapters(document.chapters);
+    setSelectedChapterIndex(chapterIndex);
     setHasLoadedFile(true);
-    setRestoredWordNumber(restoredIndex > 0 ? restoredIndex + 1 : null);
+    setRestoredWordNumber(
+      restoredProgress.currentIndex > 0
+        ? restoredProgress.currentIndex + 1
+        : null,
+    );
+  };
+
+  const handleChapterChange = (chapterIndex: number) => {
+    const chapter = chapters[chapterIndex];
+
+    if (!chapter) {
+      return;
+    }
+
+    setSelectedChapterIndex(chapterIndex);
+    setRestoredWordNumber(null);
+    loadText(chapter.text);
   };
 
   const canGoPrevious = words.length > 0 && currentIndex > 0;
@@ -82,9 +121,15 @@ function App() {
 
   useEffect(() => {
     if (fileMetadata && words.length > 0) {
-      saveProgress(currentIndex, fileMetadata);
+      saveProgress(currentIndex, selectedChapterIndex, fileMetadata);
     }
-  }, [currentIndex, fileMetadata, saveProgress, words.length]);
+  }, [
+    currentIndex,
+    fileMetadata,
+    saveProgress,
+    selectedChapterIndex,
+    words.length,
+  ]);
 
   return (
     <div className={`app theme-${theme}`}>
@@ -115,6 +160,12 @@ function App() {
             isHolding={isHolding}
           />
 
+          <ChapterSelector
+            chapters={chapters}
+            selectedIndex={selectedChapterIndex}
+            onChapterChange={handleChapterChange}
+          />
+
           <ProgressBar
             currentIndex={currentIndex}
             totalWords={words.length}
@@ -132,7 +183,7 @@ function App() {
             onWpmChange={setWpm}
           />
 
-          <FileLoader onTextLoaded={handleTextLoaded} />
+          <FileLoader onDocumentLoaded={handleDocumentLoaded} />
 
           {hasLoadedFile && (
             <p className="load-result" role="status">

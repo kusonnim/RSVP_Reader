@@ -20,6 +20,7 @@ function readPersistedState(): PersistedReaderState {
     theme: DEFAULT_THEME,
     wpm: DEFAULT_WPM,
     currentIndex: 0,
+    chapterIndex: 0,
     lastFile: null,
   };
 
@@ -44,6 +45,12 @@ function readPersistedState(): PersistedReaderState {
         parsed.currentIndex >= 0
           ? parsed.currentIndex
           : fallback.currentIndex,
+      chapterIndex:
+        typeof parsed.chapterIndex === "number" &&
+        Number.isInteger(parsed.chapterIndex) &&
+        parsed.chapterIndex >= 0
+          ? parsed.chapterIndex
+          : fallback.chapterIndex,
       lastFile:
         parsed.lastFile &&
         typeof parsed.lastFile.name === "string" &&
@@ -86,10 +93,15 @@ export function useReaderPersistence() {
   }, []);
 
   const saveProgress = useCallback(
-    (currentIndex: number, lastFile: ReaderFileMetadata) => {
+    (
+      currentIndex: number,
+      chapterIndex: number,
+      lastFile: ReaderFileMetadata,
+    ) => {
       persistedState.current = {
         ...persistedState.current,
         currentIndex,
+        chapterIndex,
         lastFile,
       };
       writePersistedState(persistedState.current);
@@ -97,18 +109,21 @@ export function useReaderPersistence() {
     [],
   );
 
-  const getRestoredIndex = useCallback(
+  const getRestoredProgress = useCallback(
     (file: ReaderFileMetadata) =>
       filesMatch(persistedState.current.lastFile, file)
-        ? persistedState.current.currentIndex
-        : 0,
+        ? {
+            currentIndex: persistedState.current.currentIndex,
+            chapterIndex: persistedState.current.chapterIndex,
+          }
+        : { currentIndex: 0, chapterIndex: 0 },
     [],
   );
 
   return {
     initialTheme: initialState.theme,
     initialWpm: initialState.wpm,
-    getRestoredIndex,
+    getRestoredProgress,
     savePreferences,
     saveProgress,
   };

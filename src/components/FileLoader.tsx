@@ -1,12 +1,13 @@
 import { type ChangeEvent, useRef, useState } from "react";
 import { parseEpubFile } from "../lib/parseEpubFile";
 import { parseTxtFile } from "../lib/parseTxtFile";
+import type { LoadedReaderDocument } from "../types/reader";
 
 type FileLoaderProps = {
-  onTextLoaded: (text: string, file: File) => void;
+  onDocumentLoaded: (document: LoadedReaderDocument, file: File) => void;
 };
 
-function FileLoader({ onTextLoaded }: FileLoaderProps) {
+function FileLoader({ onDocumentLoaded }: FileLoaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -31,11 +32,11 @@ function FileLoader({ onTextLoaded }: FileLoaderProps) {
     setIsLoading(true);
 
     try {
-      const text =
+      const document =
         extension === "epub"
           ? await parseEpubFile(file)
-          : await parseTxtFile(file);
-      onTextLoaded(text, file);
+          : { text: await parseTxtFile(file), chapters: [] };
+      onDocumentLoaded(document, file);
     } catch {
       setError(
         `That ${extension?.toUpperCase()} file could not be read. Please try another file.`,

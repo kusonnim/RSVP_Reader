@@ -382,6 +382,26 @@ Implement punctuation-aware playback timing:
 
 ---
 
+## Step 11: EPUB Chapter Selection
+
+Implement:
+
+* expose EPUB spine sections as chapters
+* let the reader switch chapters at any time
+* preserve the selected chapter and word position
+
+---
+
+## Step 12: Mobile Hold-to-Read
+
+Implement:
+
+* touch-and-hold playback
+* a large mobile-friendly hold target
+* preserve keyboard controls on desktop
+
+---
+
 # Non-Goals for MVP
 
 Do not implement yet:
