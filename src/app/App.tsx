@@ -147,7 +147,8 @@ function App() {
       <main className="app-shell">
         <header className="app-header">
           <span className="wordmark">
-            Hold-to-Read
+            <img src="/icon.svg" alt="" aria-hidden="true" />
+            <span>Hold-to-Read</span>
           </span>
           <div className="header-actions">
             <FileLoader onDocumentLoaded={handleDocumentLoaded} />
