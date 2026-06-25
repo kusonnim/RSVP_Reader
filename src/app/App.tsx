@@ -16,6 +16,7 @@ import type {
 import "./App.css";
 
 function App() {
+  const iconUrl = `${import.meta.env.BASE_URL}icon.svg`;
   const [showContext, setShowContext] = useState(false);
   const contextTimerRef = useRef<number | null>(null);
   const [fileMetadata, setFileMetadata] =
@@ -147,7 +148,7 @@ function App() {
       <main className="app-shell">
         <header className="app-header">
           <span className="wordmark">
-            <img src="/icon.svg" alt="" aria-hidden="true" />
+            <img src={iconUrl} alt="" aria-hidden="true" />
             <span>Hold-to-Read</span>
           </span>
           <div className="header-actions">
