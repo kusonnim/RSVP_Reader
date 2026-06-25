@@ -58,11 +58,22 @@ function ReaderView({ words, currentIndex, isHolding }: ReaderViewProps) {
         {contextOffsets.map((offset) => {
           const word = words[currentIndex + offset];
           const isCurrent = offset === 0;
+          const side =
+            offset < 0 ? "previous" : offset > 0 ? "next" : "current";
+          const distance = Math.abs(offset);
 
           return (
             <span
-              className={`reader-word${isCurrent ? " reader-word-current" : ""}`}
+              className={[
+                "reader-word",
+                `reader-word-${side}`,
+                `reader-word-distance-${distance}`,
+                isCurrent ? "reader-word-current" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
               key={offset}
+              title={!isCurrent && word ? word : undefined}
             >
               {word ?? ""}
             </span>
