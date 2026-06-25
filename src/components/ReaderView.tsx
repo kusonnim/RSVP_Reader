@@ -30,24 +30,26 @@ function ReaderView({ words, currentIndex, isHolding }: ReaderViewProps) {
     >
       <svg
         className="reader-progress-outline"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
         aria-hidden="true"
       >
         <rect
           className="reader-progress-track"
           x="0"
           y="0"
-          width="100"
-          height="100"
+          width="100%"
+          height="100%"
+          rx="16"
+          ry="16"
           pathLength="100"
         />
         <rect
           className="reader-progress-fill"
           x="0"
           y="0"
-          width="100"
-          height="100"
+          width="100%"
+          height="100%"
+          rx="16"
+          ry="16"
           pathLength="100"
           strokeDasharray="100"
           strokeDashoffset={100 - progress}

@@ -160,8 +160,6 @@
 .reader-progress-track,
 .reader-progress-fill {
   fill: none;
-  rx: 1rem;
-  ry: 1rem;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
