@@ -1,3 +1,5 @@
+import { getReaderWordPresentation } from "../lib/readerDelimiters";
+
 type ReaderViewProps = {
   words: string[];
   currentIndex: number;
@@ -26,6 +28,7 @@ function ReaderView({
 
   const currentWordNumber = currentIndex + 1;
   const progress = (currentWordNumber / words.length) * 100;
+  const currentPresentation = getReaderWordPresentation(words, currentIndex);
   const contextWords = contextOffsets.map((offset) => ({
     offset,
     word: words[currentIndex + offset] ?? "",
@@ -98,9 +101,17 @@ function ReaderView({
           />
         </svg>
 
-        <span className="reader-word reader-word-current">
-          {words[currentIndex]}
-        </span>
+        <div className="reader-focus-word">
+          <span className="reader-fixed-mark reader-fixed-mark-open">
+            {currentPresentation.openMarks}
+          </span>
+          <span className="reader-word reader-word-current">
+            {currentPresentation.text || words[currentIndex]}
+          </span>
+          <span className="reader-fixed-mark reader-fixed-mark-close">
+            {currentPresentation.closeMarks}
+          </span>
+        </div>
         <span className="visually-hidden">
           Current word: {words[currentIndex]}
         </span>
