@@ -20,50 +20,20 @@ function ReaderView({ words, currentIndex, isHolding }: ReaderViewProps) {
 
   const currentWordNumber = currentIndex + 1;
   const progress = (currentWordNumber / words.length) * 100;
+  const contextWords = contextOffsets
+    .filter((offset) => offset !== 0)
+    .map((offset) => ({
+      offset,
+      word: words[currentIndex + offset] ?? "",
+    }));
 
   return (
-    <section
-      className={`reader-view${isHolding ? " is-reading" : ""}`}
-      aria-label="Reader"
-      aria-live="polite"
-      aria-atomic="true"
-    >
-      <svg
-        className="reader-progress-outline"
-        aria-hidden="true"
-      >
-        <rect
-          className="reader-progress-track"
-          x="0"
-          y="0"
-          width="100%"
-          height="100%"
-          rx="16"
-          ry="16"
-          pathLength="100"
-        />
-        <rect
-          className="reader-progress-fill"
-          x="0"
-          y="0"
-          width="100%"
-          height="100%"
-          rx="16"
-          ry="16"
-          pathLength="100"
-          strokeDasharray="100"
-          strokeDashoffset={100 - progress}
-        />
-      </svg>
-
+    <div className="reader-stage">
       <div className="reader-context" aria-hidden="true">
-        {contextOffsets.map((offset) => {
-          const word = words[currentIndex + offset];
-          const isCurrent = offset === 0;
-          const side =
-            offset < 0 ? "previous" : offset > 0 ? "next" : "current";
+        {contextWords.map(({ offset, word }) => {
+          const side = offset < 0 ? "previous" : "next";
           const distance = Math.abs(offset);
-          const wordLength = word ? Array.from(word).length : 0;
+          const wordLength = Array.from(word).length;
           const lengthClass =
             wordLength > 18
               ? "reader-word-extra-long"
@@ -80,33 +50,66 @@ function ReaderView({ words, currentIndex, isHolding }: ReaderViewProps) {
                 `reader-word-${side}`,
                 `reader-word-distance-${distance}`,
                 lengthClass,
-                isCurrent ? "reader-word-current" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
+              ].join(" ")}
               key={offset}
             >
-              {word ?? ""}
+              {word}
             </span>
           );
         })}
       </div>
-      <span className="visually-hidden">
-        Current word: {words[currentIndex]}
-      </span>
-      <span className="reader-progress-label" aria-hidden="true">
-        {currentWordNumber.toLocaleString()} / {words.length.toLocaleString()}
-      </span>
-      <span
-        className="visually-hidden"
-        role="progressbar"
-        aria-label="Reading progress"
-        aria-valuemin={0}
-        aria-valuemax={words.length}
-        aria-valuenow={currentWordNumber}
-        aria-valuetext={`Word ${currentWordNumber} of ${words.length}`}
-      />
-    </section>
+
+      <section
+        className={`reader-view${isHolding ? " is-reading" : ""}`}
+        aria-label="Reader"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <svg className="reader-progress-outline" aria-hidden="true">
+          <rect
+            className="reader-progress-track"
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            rx="16"
+            ry="16"
+            pathLength="100"
+          />
+          <rect
+            className="reader-progress-fill"
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            rx="16"
+            ry="16"
+            pathLength="100"
+            strokeDasharray="100"
+            strokeDashoffset={100 - progress}
+          />
+        </svg>
+
+        <span className="reader-word reader-word-current">
+          {words[currentIndex]}
+        </span>
+        <span className="visually-hidden">
+          Current word: {words[currentIndex]}
+        </span>
+        <span className="reader-progress-label" aria-hidden="true">
+          {currentWordNumber.toLocaleString()} / {words.length.toLocaleString()}
+        </span>
+        <span
+          className="visually-hidden"
+          role="progressbar"
+          aria-label="Reading progress"
+          aria-valuemin={0}
+          aria-valuemax={words.length}
+          aria-valuenow={currentWordNumber}
+          aria-valuetext={`Word ${currentWordNumber} of ${words.length}`}
+        />
+      </section>
+    </div>
   );
 }
 
