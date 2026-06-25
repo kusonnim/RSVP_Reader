@@ -25,6 +25,7 @@ const allDelimiterCharacters = new Set([
   ...closingDelimiters.keys(),
   ...symmetricDelimiters,
 ]);
+const boundaryPunctuationPattern = /[\p{P}\p{S}]/u;
 
 function findLastMatchingIndex(
   state: DelimiterState,
@@ -100,23 +101,45 @@ function getBoundaryDelimiters(word: string) {
   const characters = Array.from(word);
   const leading: string[] = [];
   const trailing: string[] = [];
+  const preservedLeading: string[] = [];
+  const preservedTrailing: string[] = [];
   let start = 0;
   let end = characters.length;
 
-  while (start < end && allDelimiterCharacters.has(characters[start])) {
-    leading.push(characters[start]);
+  while (
+    start < end &&
+    boundaryPunctuationPattern.test(characters[start])
+  ) {
+    if (allDelimiterCharacters.has(characters[start])) {
+      leading.push(characters[start]);
+    } else {
+      preservedLeading.push(characters[start]);
+    }
+
     start += 1;
   }
 
-  while (end > start && allDelimiterCharacters.has(characters[end - 1])) {
-    trailing.unshift(characters[end - 1]);
+  while (
+    end > start &&
+    boundaryPunctuationPattern.test(characters[end - 1])
+  ) {
+    if (allDelimiterCharacters.has(characters[end - 1])) {
+      trailing.unshift(characters[end - 1]);
+    } else {
+      preservedTrailing.unshift(characters[end - 1]);
+    }
+
     end -= 1;
   }
 
   return {
     leading,
     trailing,
-    text: characters.slice(start, end).join(""),
+    text: [
+      ...preservedLeading,
+      ...characters.slice(start, end),
+      ...preservedTrailing,
+    ].join(""),
   };
 }
 
