@@ -255,6 +255,11 @@
   visibility: visible;
 }
 
+.reader-context .reader-word {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
 .reader-context .reader-word:nth-child(1) {
   grid-column: 1;
 }
@@ -327,6 +332,23 @@
 .reader-word-extra-long:not(.reader-word-current) {
   font-size: clamp(0.45rem, 0.75vw, 0.58rem);
   overflow-wrap: anywhere;
+}
+
+.reader-context .reader-word-extra-long {
+  font-size: clamp(0.36rem, 0.62vw, 0.48rem);
+  overflow-wrap: normal;
+}
+
+.reader-context .reader-word-current-preview.reader-word-medium {
+  font-size: clamp(0.65rem, 1.35vw, 0.85rem);
+}
+
+.reader-context .reader-word-current-preview.reader-word-long {
+  font-size: clamp(0.52rem, 1vw, 0.7rem);
+}
+
+.reader-context .reader-word-current-preview.reader-word-extra-long {
+  font-size: clamp(0.4rem, 0.72vw, 0.56rem);
 }
 
 .reader-word-current {
