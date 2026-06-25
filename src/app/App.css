@@ -236,7 +236,7 @@
 .reader-context {
   display: grid;
   grid-template-columns:
-    minmax(0, 0.8fr) minmax(0, 1fr) minmax(1rem, 0.7fr)
+    minmax(0, 0.8fr) minmax(0, 1fr) minmax(5rem, 1.4fr)
     minmax(0, 1fr) minmax(0, 0.8fr);
   align-items: center;
   gap: clamp(0.35rem, 1.5vw, 1rem);
@@ -264,10 +264,14 @@
 }
 
 .reader-context .reader-word:nth-child(3) {
-  grid-column: 4;
+  grid-column: 3;
 }
 
 .reader-context .reader-word:nth-child(4) {
+  grid-column: 4;
+}
+
+.reader-context .reader-word:nth-child(5) {
   grid-column: 5;
 }
 
@@ -290,6 +294,15 @@
 .reader-word-next {
   justify-self: end;
   text-align: right;
+}
+
+.reader-word-current-preview {
+  justify-self: stretch;
+  color: var(--color-text-muted);
+  font-size: clamp(0.75rem, 1.6vw, 1rem);
+  font-weight: 550;
+  opacity: 0.85;
+  text-align: center;
 }
 
 .reader-word-distance-1 {
@@ -625,7 +638,7 @@
 
   .reader-context {
     grid-template-columns:
-      minmax(0, 0.55fr) minmax(0, 0.75fr) minmax(0.75rem, 0.5fr)
+      minmax(0, 0.55fr) minmax(0, 0.75fr) minmax(4rem, 1.35fr)
       minmax(0, 0.75fr) minmax(0, 0.55fr);
     gap: 0.3rem;
     padding: 0 0.55rem;

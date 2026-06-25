@@ -26,12 +26,10 @@ function ReaderView({
 
   const currentWordNumber = currentIndex + 1;
   const progress = (currentWordNumber / words.length) * 100;
-  const contextWords = contextOffsets
-    .filter((offset) => offset !== 0)
-    .map((offset) => ({
-      offset,
-      word: words[currentIndex + offset] ?? "",
-    }));
+  const contextWords = contextOffsets.map((offset) => ({
+    offset,
+    word: words[currentIndex + offset] ?? "",
+  }));
 
   return (
     <div className="reader-stage">
@@ -40,7 +38,8 @@ function ReaderView({
         aria-hidden="true"
       >
         {contextWords.map(({ offset, word }) => {
-          const side = offset < 0 ? "previous" : "next";
+          const side =
+            offset < 0 ? "previous" : offset > 0 ? "next" : "current-preview";
           const distance = Math.abs(offset);
           const wordLength = Array.from(word).length;
           const lengthClass =
