@@ -9,6 +9,24 @@ type ReaderViewProps = {
 
 const contextOffsets = [-2, -1, 0, 1, 2];
 
+function getWordLengthClass(word: string): string {
+  const wordLength = Array.from(word).length;
+
+  if (wordLength > 18) {
+    return "reader-word-extra-long";
+  }
+
+  if (wordLength > 12) {
+    return "reader-word-long";
+  }
+
+  if (wordLength > 8) {
+    return "reader-word-medium";
+  }
+
+  return "reader-word-short";
+}
+
 function ReaderView({
   words,
   currentIndex,
@@ -29,6 +47,8 @@ function ReaderView({
   const currentWordNumber = currentIndex + 1;
   const progress = (currentWordNumber / words.length) * 100;
   const currentPresentation = getReaderWordPresentation(words, currentIndex);
+  const currentDisplayWord = currentPresentation.text || words[currentIndex];
+  const currentLengthClass = getWordLengthClass(currentDisplayWord);
   const contextWords = contextOffsets.map((offset) => ({
     offset,
     word: words[currentIndex + offset] ?? "",
@@ -44,15 +64,7 @@ function ReaderView({
           const side =
             offset < 0 ? "previous" : offset > 0 ? "next" : "current-preview";
           const distance = Math.abs(offset);
-          const wordLength = Array.from(word).length;
-          const lengthClass =
-            wordLength > 18
-              ? "reader-word-extra-long"
-              : wordLength > 12
-                ? "reader-word-long"
-                : wordLength > 8
-                  ? "reader-word-medium"
-                  : "reader-word-short";
+          const lengthClass = getWordLengthClass(word);
 
           return (
             <span
@@ -105,8 +117,10 @@ function ReaderView({
           <span className="reader-fixed-mark reader-fixed-mark-open">
             {currentPresentation.openMarks}
           </span>
-          <span className="reader-word reader-word-current">
-            {currentPresentation.text || words[currentIndex]}
+          <span
+            className={`reader-word reader-word-current ${currentLengthClass}`}
+          >
+            {currentDisplayWord}
           </span>
           <span className="reader-fixed-mark reader-fixed-mark-close">
             {currentPresentation.closeMarks}
