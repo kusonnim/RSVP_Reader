@@ -242,12 +242,11 @@
   display: block;
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
   color: var(--color-text-subtle);
   font-size: clamp(0.65rem, 1.35vw, 0.85rem);
   line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: normal;
+  white-space: normal;
 }
 
 .reader-word-previous {
@@ -271,6 +270,19 @@
   opacity: 0.42;
 }
 
+.reader-word-medium:not(.reader-word-current) {
+  font-size: clamp(0.58rem, 1.1vw, 0.75rem);
+}
+
+.reader-word-long:not(.reader-word-current) {
+  font-size: clamp(0.5rem, 0.9vw, 0.65rem);
+}
+
+.reader-word-extra-long:not(.reader-word-current) {
+  font-size: clamp(0.45rem, 0.75vw, 0.58rem);
+  overflow-wrap: anywhere;
+}
+
 .reader-word-current {
   justify-self: stretch;
   color: var(--color-text);
@@ -279,6 +291,19 @@
   letter-spacing: -0.05em;
   line-height: 1;
   text-align: center;
+}
+
+.reader-word-current.reader-word-medium {
+  font-size: clamp(1.65rem, 5vw, 3.5rem);
+}
+
+.reader-word-current.reader-word-long {
+  font-size: clamp(1.25rem, 4vw, 2.75rem);
+}
+
+.reader-word-current.reader-word-extra-long {
+  font-size: clamp(1rem, 3vw, 2rem);
+  overflow-wrap: anywhere;
 }
 
 .reader-view-empty {
