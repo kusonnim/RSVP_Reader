@@ -3,6 +3,7 @@ import { useEffect } from "react";
 type UseKeyboardControlsOptions = {
   hasWords: boolean;
   onHoldingChange: (isHolding: boolean) => void;
+  onArrowNavigate: () => void;
   onNext: () => void;
   onPrevious: () => void;
 };
@@ -24,6 +25,7 @@ function isEditableTarget(target: EventTarget | null): boolean {
 export function useKeyboardControls({
   hasWords,
   onHoldingChange,
+  onArrowNavigate,
   onNext,
   onPrevious,
 }: UseKeyboardControlsOptions) {
@@ -45,11 +47,13 @@ export function useKeyboardControls({
 
       if (event.key === "ArrowLeft") {
         event.preventDefault();
+        onArrowNavigate();
         onPrevious();
       }
 
       if (event.key === "ArrowRight") {
         event.preventDefault();
+        onArrowNavigate();
         onNext();
       }
     };
@@ -74,6 +78,5 @@ export function useKeyboardControls({
       window.removeEventListener("keyup", handleKeyUp);
       window.removeEventListener("blur", stopHolding);
     };
-  }, [hasWords, onHoldingChange, onNext, onPrevious]);
+  }, [hasWords, onArrowNavigate, onHoldingChange, onNext, onPrevious]);
 }
-

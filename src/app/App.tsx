@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ChapterSelector from "../components/ChapterSelector";
 import FileLoader from "../components/FileLoader";
 import ReaderControls from "../components/ReaderControls";
@@ -16,6 +16,8 @@ import type {
 import "./App.css";
 
 function App() {
+  const [showContext, setShowContext] = useState(false);
+  const contextTimerRef = useRef<number | null>(null);
   const [fileMetadata, setFileMetadata] =
     useState<ReaderFileMetadata | null>(null);
   const [chapters, setChapters] = useState<ReaderChapter[]>([]);
@@ -85,9 +87,23 @@ function App() {
   const canGoPrevious = words.length > 0 && currentIndex > 0;
   const canGoNext = words.length > 0 && currentIndex < words.length - 1;
 
+  const revealContext = useCallback(() => {
+    setShowContext(true);
+
+    if (contextTimerRef.current !== null) {
+      window.clearTimeout(contextTimerRef.current);
+    }
+
+    contextTimerRef.current = window.setTimeout(() => {
+      setShowContext(false);
+      contextTimerRef.current = null;
+    }, 900);
+  }, []);
+
   useKeyboardControls({
     hasWords: words.length > 0,
     onHoldingChange: setHolding,
+    onArrowNavigate: revealContext,
     onNext: nextWord,
     onPrevious: previousWord,
   });
@@ -117,6 +133,15 @@ function App() {
     words.length,
   ]);
 
+  useEffect(
+    () => () => {
+      if (contextTimerRef.current !== null) {
+        window.clearTimeout(contextTimerRef.current);
+      }
+    },
+    [],
+  );
+
   return (
     <div className={`app theme-${theme}`}>
       <main className="app-shell">
@@ -135,6 +160,7 @@ function App() {
             words={words}
             currentIndex={currentIndex}
             isHolding={isHolding}
+            showContext={showContext}
           />
 
           <ChapterSelector

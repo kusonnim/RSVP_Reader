@@ -2,11 +2,17 @@ type ReaderViewProps = {
   words: string[];
   currentIndex: number;
   isHolding: boolean;
+  showContext: boolean;
 };
 
 const contextOffsets = [-2, -1, 0, 1, 2];
 
-function ReaderView({ words, currentIndex, isHolding }: ReaderViewProps) {
+function ReaderView({
+  words,
+  currentIndex,
+  isHolding,
+  showContext,
+}: ReaderViewProps) {
   if (words.length === 0) {
     return (
       <section className="reader-view reader-view-empty" aria-live="polite">
@@ -29,7 +35,10 @@ function ReaderView({ words, currentIndex, isHolding }: ReaderViewProps) {
 
   return (
     <div className="reader-stage">
-      <div className="reader-context" aria-hidden="true">
+      <div
+        className={`reader-context${showContext ? " is-visible" : ""}`}
+        aria-hidden="true"
+      >
         {contextWords.map(({ offset, word }) => {
           const side = offset < 0 ? "previous" : "next";
           const distance = Math.abs(offset);

@@ -243,6 +243,16 @@
   width: 100%;
   min-height: 1.5rem;
   padding: 0 clamp(0.75rem, 2.5vw, 1.5rem);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 120ms ease,
+    visibility 120ms ease;
+}
+
+.reader-context.is-visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 .reader-context .reader-word:nth-child(1) {
