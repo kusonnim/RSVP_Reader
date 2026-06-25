@@ -36,22 +36,18 @@ function ReaderView({ words, currentIndex, isHolding }: ReaderViewProps) {
       >
         <rect
           className="reader-progress-track"
-          x="1"
-          y="1"
-          width="98"
-          height="98"
-          rx="4"
-          ry="4"
+          x="0"
+          y="0"
+          width="100"
+          height="100"
           pathLength="100"
         />
         <rect
           className="reader-progress-fill"
-          x="1"
-          y="1"
-          width="98"
-          height="98"
-          rx="4"
-          ry="4"
+          x="0"
+          y="0"
+          width="100"
+          height="100"
           pathLength="100"
           strokeDasharray="100"
           strokeDashoffset={100 - progress}
