@@ -366,8 +366,12 @@
 .reader-word-current {
   position: relative;
   z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: baseline;
   max-width: 100%;
-  justify-self: center;
+  width: 100%;
+  justify-self: stretch;
   color: var(--color-text);
   font-size: clamp(2rem, 6vw, 4.25rem);
   font-weight: 750;
@@ -375,6 +379,21 @@
   line-height: 1;
   text-align: center;
   white-space: nowrap;
+}
+
+.orp-before {
+  justify-self: end;
+  text-align: right;
+}
+
+.orp-focus {
+  color: var(--color-accent);
+  justify-self: center;
+}
+
+.orp-after {
+  justify-self: start;
+  text-align: left;
 }
 
 .reader-focus-word {

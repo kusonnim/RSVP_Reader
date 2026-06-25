@@ -1,4 +1,5 @@
 import { getReaderWordPresentation } from "../lib/readerDelimiters";
+import { splitWordAtOrp } from "../lib/orp";
 
 type ReaderViewProps = {
   words: string[];
@@ -49,6 +50,7 @@ function ReaderView({
   const currentPresentation = getReaderWordPresentation(words, currentIndex);
   const currentDisplayWord = currentPresentation.text || words[currentIndex];
   const currentLengthClass = getWordLengthClass(currentDisplayWord);
+  const orpParts = splitWordAtOrp(currentDisplayWord);
   const contextWords = contextOffsets.map((offset) => ({
     offset,
     word: words[currentIndex + offset] ?? "",
@@ -120,7 +122,9 @@ function ReaderView({
           <span
             className={`reader-word reader-word-current ${currentLengthClass}`}
           >
-            {currentDisplayWord}
+            <span className="orp-before">{orpParts.before}</span>
+            <span className="orp-focus">{orpParts.focus}</span>
+            <span className="orp-after">{orpParts.after}</span>
           </span>
           <span className="reader-fixed-mark reader-fixed-mark-close">
             {currentPresentation.closeMarks}
