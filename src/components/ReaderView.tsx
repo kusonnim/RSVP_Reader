@@ -14,7 +14,7 @@ type ReaderViewProps = {
 
 const contextOffsets = [-2, -1, 0, 1, 2];
 const JUMP_HOLD_DELAY_MS = 350;
-const JUMP_EDGE_HIT_AREA_PX = 32;
+const JUMP_EDGE_HIT_AREA_PX = 52;
 
 type JumpPreview = {
   index: number;
@@ -275,6 +275,7 @@ function ReaderView({
         onPointerUp={finishJumpGesture}
         onPointerCancel={finishJumpGesture}
         onLostPointerCapture={finishJumpGesture}
+        onDragStart={(event) => event.preventDefault()}
       >
         <svg className="reader-progress-outline" aria-hidden="true">
           <rect
