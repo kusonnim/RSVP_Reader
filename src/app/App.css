@@ -195,14 +195,37 @@
   transition: stroke-dashoffset 180ms ease;
 }
 
+.reader-progress-thumb {
+  fill: var(--color-accent);
+  opacity: 0.7;
+  pointer-events: none;
+  stroke: var(--color-surface);
+  stroke-width: 1.25;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
 .reader-view.is-jumping {
   cursor: grabbing;
   box-shadow: 0 0 0 0.2rem
     color-mix(in srgb, var(--color-accent) 16%, transparent);
 }
 
-.reader-view.is-jumping .reader-progress-fill {
+.reader-view.is-jumping .reader-progress-fill,
+.reader-view.is-jumping .reader-progress-thumb {
   transition: none;
+}
+
+.reader-view.is-jumping .reader-progress-thumb {
+  opacity: 1;
+  transform: scale(1.45);
+}
+
+.reader-view.is-reading .reader-progress-thumb {
+  opacity: 0;
 }
 
 .reader-progress-label {

@@ -21,6 +21,25 @@ type JumpPreview = {
   percent: number;
 };
 
+function getPerimeterPosition(percent: number, width: number, height: number) {
+  const perimeter = 2 * (width + height);
+  const distance = percent * perimeter;
+
+  if (distance <= width) {
+    return { x: distance, y: 0 };
+  }
+
+  if (distance <= width + height) {
+    return { x: width, y: distance - width };
+  }
+
+  if (distance <= width + height + width) {
+    return { x: width - (distance - width - height), y: height };
+  }
+
+  return { x: 0, y: height - (distance - width - height - width) };
+}
+
 function getWordLengthClass(word: string): string {
   const wordLength = Array.from(word).length;
 
@@ -186,6 +205,7 @@ function ReaderView({
   const currentWordNumber = currentIndex + 1;
   const progress = (currentWordNumber / words.length) * 100;
   const displayProgress = jumpPreview ? jumpPreview.percent * 100 : progress;
+  const thumbPosition = getPerimeterPosition(displayProgress / 100, 100, 100);
   const currentPresentation = getReaderWordPresentation(words, currentIndex);
   const currentDisplayWord = currentPresentation.text || words[currentIndex];
   const currentLengthClass = getWordLengthClass(currentDisplayWord);
@@ -258,6 +278,14 @@ function ReaderView({
             pathLength="100"
             strokeDasharray="100"
             strokeDashoffset={100 - displayProgress}
+          />
+          <circle
+            className="reader-progress-thumb"
+            cx={`${thumbPosition.x}%`}
+            cy={`${thumbPosition.y}%`}
+            r="0.22rem"
+            pathLength="100"
+            vectorEffect="non-scaling-stroke"
           />
         </svg>
 
