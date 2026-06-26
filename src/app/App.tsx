@@ -98,10 +98,40 @@ function App() {
     loadText(chapter.text, 0, { keepHolding: true });
   }, [chapters, loadText, selectedChapterIndex, setHolding]);
 
+  const handlePreviousChapter = useCallback(() => {
+    const previousChapterIndex = selectedChapterIndex - 1;
+    const chapter = chapters[previousChapterIndex];
+
+    if (!chapter) {
+      return;
+    }
+
+    setSelectedChapterIndex(previousChapterIndex);
+    loadText(chapter.text, Number.MAX_SAFE_INTEGER, { keepHolding: true });
+  }, [chapters, loadText, selectedChapterIndex]);
+
   const canGoPrevious = words.length > 0 && currentIndex > 0;
   const canGoNext = words.length > 0 && currentIndex < words.length - 1;
+  const canGoPreviousChapter =
+    chapters.length > 0 && selectedChapterIndex > 0;
   const canGoNextChapter =
     chapters.length > 0 && selectedChapterIndex < chapters.length - 1;
+
+  const handleScrubPrevious = useCallback(() => {
+    if (canGoPrevious) {
+      previousWord();
+    } else if (canGoPreviousChapter) {
+      handlePreviousChapter();
+    }
+  }, [canGoPrevious, canGoPreviousChapter, handlePreviousChapter, previousWord]);
+
+  const handleScrubNext = useCallback(() => {
+    if (canGoNext) {
+      nextWord();
+    } else if (canGoNextChapter) {
+      handleAdvanceChapter();
+    }
+  }, [canGoNext, canGoNextChapter, handleAdvanceChapter, nextWord]);
 
   const revealContext = useCallback(() => {
     setShowContext(true);
@@ -192,10 +222,13 @@ function App() {
             hasWords={words.length > 0}
             canGoPrevious={canGoPrevious}
             canGoNext={canGoNext}
+            canContinueReading={canGoNext || canGoNextChapter}
             isHolding={isHolding}
             wpm={wpm}
             onPrevious={previousWord}
             onNext={nextWord}
+            onScrubPrevious={handleScrubPrevious}
+            onScrubNext={handleScrubNext}
             onReset={reset}
             onWpmChange={setWpm}
             onHoldingChange={setHolding}

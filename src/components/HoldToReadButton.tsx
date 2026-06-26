@@ -9,16 +9,23 @@ type HoldToReadButtonProps = {
   canRead: boolean;
   hasWords: boolean;
   isHolding: boolean;
+  onScrubNext: () => void;
+  onScrubPrevious: () => void;
   onHoldingChange: (isHolding: boolean) => void;
 };
+
+const SCRUB_DISTANCE_PX = 28;
 
 function HoldToReadButton({
   canRead,
   hasWords,
   isHolding,
+  onScrubNext,
+  onScrubPrevious,
   onHoldingChange,
 }: HoldToReadButtonProps) {
   const activePointerId = useRef<number | null>(null);
+  const lastScrubX = useRef(0);
 
   useEffect(() => {
     if (!isHolding) {
@@ -33,8 +40,32 @@ function HoldToReadButton({
 
     event.preventDefault();
     activePointerId.current = event.pointerId;
+    lastScrubX.current = event.clientX;
     event.currentTarget.setPointerCapture(event.pointerId);
     onHoldingChange(true);
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLButtonElement>) => {
+    if (activePointerId.current !== event.pointerId || !isHolding) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const movement = event.clientX - lastScrubX.current;
+
+    if (Math.abs(movement) < SCRUB_DISTANCE_PX) {
+      return;
+    }
+
+    const steps = Math.trunc(movement / SCRUB_DISTANCE_PX);
+    const scrub = steps > 0 ? onScrubNext : onScrubPrevious;
+
+    for (let step = 0; step < Math.abs(steps); step += 1) {
+      scrub();
+    }
+
+    lastScrubX.current += steps * SCRUB_DISTANCE_PX;
   };
 
   const stopPointerHold = (event: PointerEvent<HTMLButtonElement>) => {
@@ -84,6 +115,7 @@ function HoldToReadButton({
       disabled={!canRead}
       aria-pressed={isHolding}
       onPointerDown={startPointerHold}
+      onPointerMove={handlePointerMove}
       onPointerUp={stopPointerHold}
       onPointerCancel={stopPointerHold}
       onLostPointerCapture={stopPointerHold}

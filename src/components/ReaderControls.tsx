@@ -4,10 +4,13 @@ type ReaderControlsProps = {
   hasWords: boolean;
   canGoPrevious: boolean;
   canGoNext: boolean;
+  canContinueReading: boolean;
   isHolding: boolean;
   wpm: number;
   onPrevious: () => void;
   onNext: () => void;
+  onScrubPrevious: () => void;
+  onScrubNext: () => void;
   onReset: () => void;
   onWpmChange: (wpm: number) => void;
   onHoldingChange: (isHolding: boolean) => void;
@@ -17,10 +20,13 @@ function ReaderControls({
   hasWords,
   canGoPrevious,
   canGoNext,
+  canContinueReading,
   isHolding,
   wpm,
   onPrevious,
   onNext,
+  onScrubPrevious,
+  onScrubNext,
   onReset,
   onWpmChange,
   onHoldingChange,
@@ -47,9 +53,11 @@ function ReaderControls({
       </div>
 
       <HoldToReadButton
-        canRead={canGoNext}
+        canRead={canContinueReading}
         hasWords={hasWords}
         isHolding={isHolding}
+        onScrubNext={onScrubNext}
+        onScrubPrevious={onScrubPrevious}
         onHoldingChange={onHoldingChange}
       />
 
