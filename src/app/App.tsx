@@ -85,8 +85,23 @@ function App() {
     loadText(chapter.text);
   };
 
+  const handleAdvanceChapter = useCallback(() => {
+    const nextChapterIndex = selectedChapterIndex + 1;
+    const chapter = chapters[nextChapterIndex];
+
+    if (!chapter) {
+      setHolding(false);
+      return;
+    }
+
+    setSelectedChapterIndex(nextChapterIndex);
+    loadText(chapter.text, 0, { keepHolding: true });
+  }, [chapters, loadText, selectedChapterIndex, setHolding]);
+
   const canGoPrevious = words.length > 0 && currentIndex > 0;
   const canGoNext = words.length > 0 && currentIndex < words.length - 1;
+  const canGoNextChapter =
+    chapters.length > 0 && selectedChapterIndex < chapters.length - 1;
 
   const revealContext = useCallback(() => {
     setShowContext(true);
@@ -114,7 +129,9 @@ function App() {
     wpm,
     currentWord: words[currentIndex] ?? "",
     canAdvance: canGoNext,
+    canAdvanceChapter: canGoNextChapter,
     onAdvance: nextWord,
+    onAdvanceChapter: handleAdvanceChapter,
     onStop: () => setHolding(false),
   });
 

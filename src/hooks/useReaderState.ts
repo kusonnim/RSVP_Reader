@@ -11,6 +11,10 @@ type InitialReaderPreferences = {
   wpm?: number;
 };
 
+type LoadTextOptions = {
+  keepHolding?: boolean;
+};
+
 export function useReaderState(initialPreferences: InitialReaderPreferences = {}) {
   const [state, setState] = useState<ReaderState>({
     words: [],
@@ -20,19 +24,22 @@ export function useReaderState(initialPreferences: InitialReaderPreferences = {}
     theme: initialPreferences.theme ?? "light",
   });
 
-  const loadText = useCallback((text: string, restoredIndex = 0) => {
-    const words = tokenizeText(text);
+  const loadText = useCallback(
+    (text: string, restoredIndex = 0, options: LoadTextOptions = {}) => {
+      const words = tokenizeText(text);
 
-    setState((current) => ({
-      ...current,
-      words,
-      currentIndex:
-        words.length > 0
-          ? Math.min(Math.max(0, restoredIndex), words.length - 1)
-          : 0,
-      isHolding: false,
-    }));
-  }, []);
+      setState((current) => ({
+        ...current,
+        words,
+        currentIndex:
+          words.length > 0
+            ? Math.min(Math.max(0, restoredIndex), words.length - 1)
+            : 0,
+        isHolding: options.keepHolding ? current.isHolding : false,
+      }));
+    },
+    [],
+  );
 
   const nextWord = useCallback(() => {
     setState((current) => ({
