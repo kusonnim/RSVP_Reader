@@ -47,7 +47,7 @@ function resolveArchivePath(baseFilePath: string, relativePath: string): string 
   return normalizeArchivePath(`${baseDirectory}${decodedPath}`);
 }
 
-function extractChapter(markup: string, id: string, index: number): ReaderChapter {
+function extractChapter(markup: string, id: string): ReaderChapter {
   const document = new DOMParser().parseFromString(markup, "text/html");
 
   document
@@ -57,7 +57,7 @@ function extractChapter(markup: string, id: string, index: number): ReaderChapte
   const text = document.body?.textContent?.replace(/\s+/g, " ").trim() ?? "";
   const heading = document.querySelector("h1, h2, h3, title");
   const title =
-    heading?.textContent?.replace(/\s+/g, " ").trim() || `Chapter ${index + 1}`;
+    heading?.textContent?.replace(/\s+/g, " ").trim() || "No heading";
 
   return { id, title, text };
 }
@@ -121,7 +121,6 @@ export async function parseEpubFile(file: File): Promise<LoadedReaderDocument> {
     const chapter = extractChapter(
       await chapterEntry.async("text"),
       chapterPath,
-      chapters.length,
     );
 
     if (chapter.text) {
