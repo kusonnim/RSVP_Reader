@@ -8,18 +8,19 @@ type HoldToReadButtonProps = {
   canRead: boolean;
   hasWords: boolean;
   isHolding: boolean;
-  onScrubNext: () => void;
-  onScrubPrevious: () => void;
+  scrubWordsPerStep: number;
+  onScrubNext: (wordCount: number) => void;
+  onScrubPrevious: (wordCount: number) => void;
   onHoldingChange: (isHolding: boolean) => void;
 };
 
 const SCRUB_DISTANCE_PX = 28;
-const SCRUB_WORDS_PER_STEP = 4;
 
 function HoldToReadButton({
   canRead,
   hasWords,
   isHolding,
+  scrubWordsPerStep,
   onScrubNext,
   onScrubPrevious,
   onHoldingChange,
@@ -61,14 +62,9 @@ function HoldToReadButton({
 
     const steps = Math.trunc(movement / SCRUB_DISTANCE_PX);
     const scrub = steps > 0 ? onScrubNext : onScrubPrevious;
+    const wordCount = Math.abs(steps) * scrubWordsPerStep;
 
-    for (
-      let step = 0;
-      step < Math.abs(steps) * SCRUB_WORDS_PER_STEP;
-      step += 1
-    ) {
-      scrub();
-    }
+    scrub(wordCount);
 
     lastScrubX.current += steps * SCRUB_DISTANCE_PX;
   };

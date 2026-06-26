@@ -58,6 +58,19 @@ export function useReaderState(initialPreferences: InitialReaderPreferences = {}
     }));
   }, []);
 
+  const moveWords = useCallback((delta: number) => {
+    setState((current) => ({
+      ...current,
+      currentIndex:
+        current.words.length > 0
+          ? Math.min(
+              Math.max(0, current.words.length - 1),
+              Math.max(0, current.currentIndex + delta),
+            )
+          : 0,
+    }));
+  }, []);
+
   const reset = useCallback(() => {
     setState((current) => ({
       ...current,
@@ -92,6 +105,7 @@ export function useReaderState(initialPreferences: InitialReaderPreferences = {}
     loadText,
     nextWord,
     previousWord,
+    moveWords,
     reset,
     setWpm,
     setHolding,

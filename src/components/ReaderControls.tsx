@@ -2,6 +2,7 @@ import HoldToReadButton from "./HoldToReadButton";
 
 type ReaderControlsProps = {
   hasWords: boolean;
+  wordCount: number;
   canGoPrevious: boolean;
   canGoNext: boolean;
   canContinueReading: boolean;
@@ -9,8 +10,8 @@ type ReaderControlsProps = {
   wpm: number;
   onPrevious: () => void;
   onNext: () => void;
-  onScrubPrevious: () => void;
-  onScrubNext: () => void;
+  onScrubPrevious: (wordCount: number) => void;
+  onScrubNext: (wordCount: number) => void;
   onReset: () => void;
   onWpmChange: (wpm: number) => void;
   onHoldingChange: (isHolding: boolean) => void;
@@ -18,6 +19,7 @@ type ReaderControlsProps = {
 
 function ReaderControls({
   hasWords,
+  wordCount,
   canGoPrevious,
   canGoNext,
   canContinueReading,
@@ -31,6 +33,11 @@ function ReaderControls({
   onWpmChange,
   onHoldingChange,
 }: ReaderControlsProps) {
+  const scrubWordsPerStep = Math.min(
+    80,
+    Math.max(1, Math.round(wordCount / 250)),
+  );
+
   return (
     <div className="controls-panel">
       <div className="speed-control">
@@ -56,6 +63,7 @@ function ReaderControls({
         canRead={canContinueReading}
         hasWords={hasWords}
         isHolding={isHolding}
+        scrubWordsPerStep={scrubWordsPerStep}
         onScrubNext={onScrubNext}
         onScrubPrevious={onScrubPrevious}
         onHoldingChange={onHoldingChange}
