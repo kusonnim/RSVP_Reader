@@ -65,6 +65,16 @@ function hasMatchingSymmetricDelimiter(state: DelimiterState, mark: string) {
   );
 }
 
+function hasMatchingPairedDelimiter(
+  state: DelimiterState,
+  open: string,
+  close: string,
+) {
+  return state.some(
+    (delimiter) => delimiter.open === open && delimiter.close === close,
+  );
+}
+
 function applyDelimiter(
   state: DelimiterState,
   mark: string,
@@ -73,6 +83,13 @@ function applyDelimiter(
   const close = pairedDelimiters.get(mark);
 
   if (close) {
+    if (
+      position === "leading" &&
+      hasMatchingPairedDelimiter(state, mark, close)
+    ) {
+      return;
+    }
+
     state.push({ open: mark, close });
     return;
   }
@@ -99,10 +116,12 @@ function applyDelimiter(
         (delimiter) => delimiter.open === mark && delimiter.close === mark,
       );
 
-      if (!isAlreadyOpen) {
-        state.push({ open: mark, close: mark });
+      if (isAlreadyOpen) {
         return;
       }
+
+      state.push({ open: mark, close: mark });
+      return;
     }
 
     toggleSymmetricDelimiter(state, mark);
@@ -155,7 +174,7 @@ function shouldApplyDelimiter(
     }
 
     if (hasMatchingSymmetricDelimiter(state, mark)) {
-      return index > 0;
+      return index > 0 || isLeadingDelimiterPosition(characters, index);
     }
 
     return isLeadingDelimiterPosition(characters, index);
