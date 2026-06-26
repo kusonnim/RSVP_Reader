@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useRef,
   type KeyboardEvent,
   type PointerEvent,
@@ -15,6 +14,7 @@ type HoldToReadButtonProps = {
 };
 
 const SCRUB_DISTANCE_PX = 28;
+const SCRUB_WORDS_PER_STEP = 4;
 
 function HoldToReadButton({
   canRead,
@@ -26,12 +26,7 @@ function HoldToReadButton({
 }: HoldToReadButtonProps) {
   const activePointerId = useRef<number | null>(null);
   const lastScrubX = useRef(0);
-
-  useEffect(() => {
-    if (!isHolding) {
-      activePointerId.current = null;
-    }
-  }, [isHolding]);
+  const hasPausedForScrub = useRef(false);
 
   const startPointerHold = (event: PointerEvent<HTMLButtonElement>) => {
     if (!canRead || activePointerId.current !== null) {
@@ -41,12 +36,13 @@ function HoldToReadButton({
     event.preventDefault();
     activePointerId.current = event.pointerId;
     lastScrubX.current = event.clientX;
+    hasPausedForScrub.current = false;
     event.currentTarget.setPointerCapture(event.pointerId);
     onHoldingChange(true);
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLButtonElement>) => {
-    if (activePointerId.current !== event.pointerId || !isHolding) {
+    if (activePointerId.current !== event.pointerId) {
       return;
     }
 
@@ -58,10 +54,19 @@ function HoldToReadButton({
       return;
     }
 
+    if (!hasPausedForScrub.current) {
+      hasPausedForScrub.current = true;
+      onHoldingChange(false);
+    }
+
     const steps = Math.trunc(movement / SCRUB_DISTANCE_PX);
     const scrub = steps > 0 ? onScrubNext : onScrubPrevious;
 
-    for (let step = 0; step < Math.abs(steps); step += 1) {
+    for (
+      let step = 0;
+      step < Math.abs(steps) * SCRUB_WORDS_PER_STEP;
+      step += 1
+    ) {
       scrub();
     }
 
@@ -74,6 +79,7 @@ function HoldToReadButton({
     }
 
     activePointerId.current = null;
+    hasPausedForScrub.current = false;
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);

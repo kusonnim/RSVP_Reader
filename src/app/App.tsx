@@ -222,7 +222,12 @@ function App() {
             hasWords={words.length > 0}
             canGoPrevious={canGoPrevious}
             canGoNext={canGoNext}
-            canContinueReading={canGoNext || canGoNextChapter}
+            canContinueReading={
+              canGoPrevious ||
+              canGoPreviousChapter ||
+              canGoNext ||
+              canGoNextChapter
+            }
             isHolding={isHolding}
             wpm={wpm}
             onPrevious={previousWord}
