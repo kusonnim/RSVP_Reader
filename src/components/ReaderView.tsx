@@ -15,6 +15,8 @@ type ReaderViewProps = {
 const contextOffsets = [-2, -1, 0, 1, 2];
 const JUMP_HOLD_DELAY_MS = 350;
 const JUMP_EDGE_HIT_AREA_PX = 52;
+const JUMP_PATH_SAMPLE_COUNT = 180;
+const JUMP_PATH_REFINE_STEPS = 8;
 
 type JumpPreview = {
   index: number;
@@ -27,6 +29,69 @@ type ProgressThumbPosition = {
 };
 
 const initialThumbPosition: ProgressThumbPosition = { x: 0, y: 0 };
+
+function getDistanceSquared(
+  point: DOMPoint,
+  targetX: number,
+  targetY: number,
+) {
+  return (point.x - targetX) ** 2 + (point.y - targetY) ** 2;
+}
+
+function getNearestPathPercent(
+  path: SVGGeometryElement,
+  targetX: number,
+  targetY: number,
+) {
+  const totalLength = path.getTotalLength();
+  let closestLength = 0;
+  let closestDistance = Number.POSITIVE_INFINITY;
+
+  for (let index = 0; index <= JUMP_PATH_SAMPLE_COUNT; index += 1) {
+    const length = (index / JUMP_PATH_SAMPLE_COUNT) * totalLength;
+    const point = path.getPointAtLength(length);
+    const distance = getDistanceSquared(point, targetX, targetY);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestLength = length;
+    }
+  }
+
+  let searchRadius = totalLength / JUMP_PATH_SAMPLE_COUNT;
+
+  for (let step = 0; step < JUMP_PATH_REFINE_STEPS; step += 1) {
+    const beforeLength = Math.max(0, closestLength - searchRadius);
+    const afterLength = Math.min(totalLength, closestLength + searchRadius);
+    const beforeDistance = getDistanceSquared(
+      path.getPointAtLength(beforeLength),
+      targetX,
+      targetY,
+    );
+    const afterDistance = getDistanceSquared(
+      path.getPointAtLength(afterLength),
+      targetX,
+      targetY,
+    );
+
+    if (beforeDistance < closestDistance) {
+      closestDistance = beforeDistance;
+      closestLength = beforeLength;
+    }
+
+    if (afterDistance < closestDistance) {
+      closestDistance = afterDistance;
+      closestLength = afterLength;
+    }
+
+    searchRadius /= 2;
+  }
+
+  return {
+    distance: Math.sqrt(closestDistance),
+    percent: totalLength > 0 ? closestLength / totalLength : 0,
+  };
+}
 
 function getWordLengthClass(word: string): string {
   const wordLength = Array.from(word).length;
@@ -73,39 +138,22 @@ function ReaderView({
     event: PointerEvent<HTMLElement>,
     element: HTMLElement,
   ): JumpPreview | null => {
-    const rect = element.getBoundingClientRect();
-    const x = Math.min(Math.max(0, event.clientX - rect.left), rect.width);
-    const y = Math.min(Math.max(0, event.clientY - rect.top), rect.height);
-    const distances = {
-      top: y,
-      right: rect.width - x,
-      bottom: rect.height - y,
-      left: x,
-    };
-    const nearestEdge = Object.entries(distances).sort(
-      ([, distanceA], [, distanceB]) => distanceA - distanceB,
-    )[0]?.[0];
+    const progressFill = progressFillRef.current;
 
-    if (
-      !nearestEdge ||
-      distances[nearestEdge as keyof typeof distances] > JUMP_EDGE_HIT_AREA_PX
-    ) {
+    if (!progressFill) {
       return null;
     }
 
-    const perimeter = 2 * (rect.width + rect.height);
-    let perimeterPosition = x;
+    const rect = element.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const nearestPoint = getNearestPathPercent(progressFill, x, y);
 
-    if (nearestEdge === "right") {
-      perimeterPosition = rect.width + y;
-    } else if (nearestEdge === "bottom") {
-      perimeterPosition = rect.width + rect.height + (rect.width - x);
-    } else if (nearestEdge === "left") {
-      perimeterPosition =
-        rect.width + rect.height + rect.width + (rect.height - y);
+    if (nearestPoint.distance > JUMP_EDGE_HIT_AREA_PX) {
+      return null;
     }
 
-    const percent = Math.min(1, Math.max(0, perimeterPosition / perimeter));
+    const percent = Math.min(1, Math.max(0, nearestPoint.percent));
     const index = Math.min(
       words.length - 1,
       Math.max(0, Math.round(percent * (words.length - 1))),
