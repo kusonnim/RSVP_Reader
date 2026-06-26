@@ -21,24 +21,12 @@ type JumpPreview = {
   percent: number;
 };
 
-function getPerimeterPosition(percent: number, width: number, height: number) {
-  const perimeter = 2 * (width + height);
-  const distance = percent * perimeter;
+type ProgressThumbPosition = {
+  x: number;
+  y: number;
+};
 
-  if (distance <= width) {
-    return { x: distance, y: 0 };
-  }
-
-  if (distance <= width + height) {
-    return { x: width, y: distance - width };
-  }
-
-  if (distance <= width + height + width) {
-    return { x: width - (distance - width - height), y: height };
-  }
-
-  return { x: 0, y: height - (distance - width - height - width) };
-}
+const initialThumbPosition: ProgressThumbPosition = { x: 0, y: 0 };
 
 function getWordLengthClass(word: string): string {
   const wordLength = Array.from(word).length;
@@ -69,7 +57,10 @@ function ReaderView({
   const jumpPointerId = useRef<number | null>(null);
   const jumpHoldTimerId = useRef<number | null>(null);
   const pendingJumpPreview = useRef<JumpPreview | null>(null);
+  const progressFillRef = useRef<SVGRectElement | null>(null);
   const [jumpPreview, setJumpPreview] = useState<JumpPreview | null>(null);
+  const [thumbPosition, setThumbPosition] =
+    useState<ProgressThumbPosition>(initialThumbPosition);
 
   const clearJumpHoldTimer = () => {
     if (jumpHoldTimerId.current !== null) {
@@ -191,6 +182,36 @@ function ReaderView({
     [],
   );
 
+  useEffect(() => {
+    const progressFill = progressFillRef.current;
+
+    if (!progressFill || words.length === 0) {
+      return;
+    }
+
+    const displayProgress = jumpPreview
+      ? jumpPreview.percent * 100
+      : ((currentIndex + 1) / words.length) * 100;
+
+    const updateThumbPosition = () => {
+      const totalLength = progressFill.getTotalLength();
+      const point = progressFill.getPointAtLength(
+        totalLength * (displayProgress / 100),
+      );
+
+      setThumbPosition({ x: point.x, y: point.y });
+    };
+
+    updateThumbPosition();
+
+    const resizeObserver = new ResizeObserver(updateThumbPosition);
+    resizeObserver.observe(progressFill);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [currentIndex, jumpPreview, words.length]);
+
   if (words.length === 0) {
     return (
       <section className="reader-view reader-view-empty" aria-live="polite">
@@ -205,7 +226,6 @@ function ReaderView({
   const currentWordNumber = currentIndex + 1;
   const progress = (currentWordNumber / words.length) * 100;
   const displayProgress = jumpPreview ? jumpPreview.percent * 100 : progress;
-  const thumbPosition = getPerimeterPosition(displayProgress / 100, 100, 100);
   const currentPresentation = getReaderWordPresentation(words, currentIndex);
   const currentDisplayWord = currentPresentation.text || words[currentIndex];
   const currentLengthClass = getWordLengthClass(currentDisplayWord);
@@ -268,6 +288,7 @@ function ReaderView({
             pathLength="100"
           />
           <rect
+            ref={progressFillRef}
             className="reader-progress-fill"
             x="0"
             y="0"
@@ -281,9 +302,9 @@ function ReaderView({
           />
           <circle
             className="reader-progress-thumb"
-            cx={`${thumbPosition.x}%`}
-            cy={`${thumbPosition.y}%`}
-            r="0.22rem"
+            cx={thumbPosition.x}
+            cy={thumbPosition.y}
+            r="4"
             pathLength="100"
             vectorEffect="non-scaling-stroke"
           />
