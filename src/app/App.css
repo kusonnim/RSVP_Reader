@@ -144,6 +144,7 @@
   border-radius: 1rem;
   background: var(--color-surface);
   box-shadow: none;
+  touch-action: none;
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
@@ -194,6 +195,16 @@
   transition: stroke-dashoffset 180ms ease;
 }
 
+.reader-view.is-jumping {
+  cursor: grabbing;
+  box-shadow: 0 0 0 0.2rem
+    color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+
+.reader-view.is-jumping .reader-progress-fill {
+  transition: none;
+}
+
 .reader-progress-label {
   position: absolute;
   right: 0.85rem;
@@ -202,6 +213,27 @@
   color: var(--color-text-subtle);
   font-size: 0.7rem;
   font-variant-numeric: tabular-nums;
+}
+
+.reader-jump-preview {
+  position: absolute;
+  top: 0.7rem;
+  left: 50%;
+  z-index: 3;
+  max-width: calc(100% - 2rem);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.22rem 0.65rem;
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  box-shadow: 0 0.5rem 1.5rem
+    color-mix(in srgb, var(--color-text) 8%, transparent);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+  text-align: center;
+  transform: translateX(-50%);
+  white-space: nowrap;
 }
 
 .reader-view.is-reading {

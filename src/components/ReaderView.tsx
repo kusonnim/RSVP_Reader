@@ -1,14 +1,24 @@
-import { getReaderWordPresentation } from "../lib/readerDelimiters";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { splitWordAtOrp } from "../lib/orp";
+import { getReaderWordPresentation } from "../lib/readerDelimiters";
 
 type ReaderViewProps = {
   words: string[];
   currentIndex: number;
   isHolding: boolean;
   showContext: boolean;
+  onJumpStart: () => void;
+  onJumpToIndex: (index: number) => void;
 };
 
 const contextOffsets = [-2, -1, 0, 1, 2];
+const JUMP_HOLD_DELAY_MS = 350;
+const JUMP_EDGE_HIT_AREA_PX = 32;
+
+type JumpPreview = {
+  index: number;
+  percent: number;
+};
 
 function getWordLengthClass(word: string): string {
   const wordLength = Array.from(word).length;
@@ -33,7 +43,133 @@ function ReaderView({
   currentIndex,
   isHolding,
   showContext,
+  onJumpStart,
+  onJumpToIndex,
 }: ReaderViewProps) {
+  const jumpPointerId = useRef<number | null>(null);
+  const jumpHoldTimerId = useRef<number | null>(null);
+  const pendingJumpPreview = useRef<JumpPreview | null>(null);
+  const [jumpPreview, setJumpPreview] = useState<JumpPreview | null>(null);
+
+  const clearJumpHoldTimer = () => {
+    if (jumpHoldTimerId.current !== null) {
+      window.clearTimeout(jumpHoldTimerId.current);
+      jumpHoldTimerId.current = null;
+    }
+  };
+
+  const getJumpPreview = (
+    event: PointerEvent<HTMLElement>,
+    element: HTMLElement,
+  ): JumpPreview | null => {
+    const rect = element.getBoundingClientRect();
+    const x = Math.min(Math.max(0, event.clientX - rect.left), rect.width);
+    const y = Math.min(Math.max(0, event.clientY - rect.top), rect.height);
+    const distances = {
+      top: y,
+      right: rect.width - x,
+      bottom: rect.height - y,
+      left: x,
+    };
+    const nearestEdge = Object.entries(distances).sort(
+      ([, distanceA], [, distanceB]) => distanceA - distanceB,
+    )[0]?.[0];
+
+    if (
+      !nearestEdge ||
+      distances[nearestEdge as keyof typeof distances] > JUMP_EDGE_HIT_AREA_PX
+    ) {
+      return null;
+    }
+
+    const perimeter = 2 * (rect.width + rect.height);
+    let perimeterPosition = x;
+
+    if (nearestEdge === "right") {
+      perimeterPosition = rect.width + y;
+    } else if (nearestEdge === "bottom") {
+      perimeterPosition = rect.width + rect.height + (rect.width - x);
+    } else if (nearestEdge === "left") {
+      perimeterPosition =
+        rect.width + rect.height + rect.width + (rect.height - y);
+    }
+
+    const percent = Math.min(1, Math.max(0, perimeterPosition / perimeter));
+    const index = Math.min(
+      words.length - 1,
+      Math.max(0, Math.round(percent * (words.length - 1))),
+    );
+
+    return { index, percent };
+  };
+
+  const startJumpGesture = (event: PointerEvent<HTMLElement>) => {
+    const preview = getJumpPreview(event, event.currentTarget);
+
+    if (!preview) {
+      return;
+    }
+
+    event.preventDefault();
+    jumpPointerId.current = event.pointerId;
+    pendingJumpPreview.current = preview;
+    event.currentTarget.setPointerCapture(event.pointerId);
+
+    jumpHoldTimerId.current = window.setTimeout(() => {
+      jumpHoldTimerId.current = null;
+      onJumpStart();
+      setJumpPreview(pendingJumpPreview.current);
+    }, JUMP_HOLD_DELAY_MS);
+  };
+
+  const updateJumpGesture = (event: PointerEvent<HTMLElement>) => {
+    if (jumpPointerId.current !== event.pointerId) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const preview = getJumpPreview(event, event.currentTarget);
+
+    if (!preview) {
+      return;
+    }
+
+    pendingJumpPreview.current = preview;
+
+    if (jumpPreview) {
+      setJumpPreview(preview);
+    }
+  };
+
+  const finishJumpGesture = (event: PointerEvent<HTMLElement>) => {
+    if (jumpPointerId.current !== event.pointerId) {
+      return;
+    }
+
+    const committedPreview = jumpPreview;
+
+    clearJumpHoldTimer();
+    jumpPointerId.current = null;
+    pendingJumpPreview.current = null;
+    setJumpPreview(null);
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    if (committedPreview) {
+      onJumpToIndex(committedPreview.index);
+    }
+  };
+
+  useEffect(
+    () => () => {
+      clearJumpHoldTimer();
+    },
+    [],
+  );
+
   if (words.length === 0) {
     return (
       <section className="reader-view reader-view-empty" aria-live="polite">
@@ -47,6 +183,7 @@ function ReaderView({
 
   const currentWordNumber = currentIndex + 1;
   const progress = (currentWordNumber / words.length) * 100;
+  const displayProgress = jumpPreview ? jumpPreview.percent * 100 : progress;
   const currentPresentation = getReaderWordPresentation(words, currentIndex);
   const currentDisplayWord = currentPresentation.text || words[currentIndex];
   const currentLengthClass = getWordLengthClass(currentDisplayWord);
@@ -85,10 +222,17 @@ function ReaderView({
       </div>
 
       <section
-        className={`reader-view${isHolding ? " is-reading" : ""}`}
+        className={`reader-view${isHolding ? " is-reading" : ""}${
+          jumpPreview ? " is-jumping" : ""
+        }`}
         aria-label="Reader"
         aria-live="polite"
         aria-atomic="true"
+        onPointerDown={startJumpGesture}
+        onPointerMove={updateJumpGesture}
+        onPointerUp={finishJumpGesture}
+        onPointerCancel={finishJumpGesture}
+        onLostPointerCapture={finishJumpGesture}
       >
         <svg className="reader-progress-outline" aria-hidden="true">
           <rect
@@ -111,7 +255,7 @@ function ReaderView({
             ry="16"
             pathLength="100"
             strokeDasharray="100"
-            strokeDashoffset={100 - progress}
+            strokeDashoffset={100 - displayProgress}
           />
         </svg>
 
@@ -134,8 +278,15 @@ function ReaderView({
           Current word: {words[currentIndex]}
         </span>
         <span className="reader-progress-label" aria-hidden="true">
-          {currentWordNumber.toLocaleString()} / {words.length.toLocaleString()}
+          {((jumpPreview?.index ?? currentIndex) + 1).toLocaleString()} /{" "}
+          {words.length.toLocaleString()}
         </span>
+        {jumpPreview ? (
+          <span className="reader-jump-preview" aria-hidden="true">
+            Jump to {Math.round(jumpPreview.percent * 100)}% - word{" "}
+            {(jumpPreview.index + 1).toLocaleString()}
+          </span>
+        ) : null}
         <span
           className="visually-hidden"
           role="progressbar"

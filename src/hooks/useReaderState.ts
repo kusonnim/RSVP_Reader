@@ -71,6 +71,17 @@ export function useReaderState(initialPreferences: InitialReaderPreferences = {}
     }));
   }, []);
 
+  const jumpToWord = useCallback((index: number) => {
+    setState((current) => ({
+      ...current,
+      currentIndex:
+        current.words.length > 0
+          ? Math.min(Math.max(0, index), current.words.length - 1)
+          : 0,
+      isHolding: false,
+    }));
+  }, []);
+
   const reset = useCallback(() => {
     setState((current) => ({
       ...current,
@@ -106,6 +117,7 @@ export function useReaderState(initialPreferences: InitialReaderPreferences = {}
     nextWord,
     previousWord,
     moveWords,
+    jumpToWord,
     reset,
     setWpm,
     setHolding,

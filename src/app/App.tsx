@@ -40,6 +40,7 @@ function App() {
     nextWord,
     previousWord,
     moveWords,
+    jumpToWord,
     reset,
     setWpm,
     setHolding,
@@ -231,6 +232,8 @@ function App() {
             currentIndex={currentIndex}
             isHolding={isHolding}
             showContext={showContext}
+            onJumpStart={() => setHolding(false)}
+            onJumpToIndex={jumpToWord}
           />
 
           <ChapterSelector
