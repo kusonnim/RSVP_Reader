@@ -215,12 +215,10 @@ function ReaderView({
     }
   };
 
-  const finishJumpGesture = (event: PointerEvent<HTMLElement>) => {
+  const resetJumpGesture = (event: PointerEvent<HTMLElement>) => {
     if (jumpPointerId.current !== event.pointerId) {
-      return;
+      return false;
     }
-
-    const committedPreview = jumpPreview;
 
     clearJumpHoldTimer();
     jumpPointerId.current = null;
@@ -231,9 +229,23 @@ function ReaderView({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
 
+    return true;
+  };
+
+  const commitJumpGesture = (event: PointerEvent<HTMLElement>) => {
+    const committedPreview = jumpPreview;
+
+    if (!resetJumpGesture(event)) {
+      return;
+    }
+
     if (committedPreview) {
       onJumpToIndex(committedPreview.index);
     }
+  };
+
+  const cancelJumpGesture = (event: PointerEvent<HTMLElement>) => {
+    resetJumpGesture(event);
   };
 
   useEffect(
@@ -328,9 +340,9 @@ function ReaderView({
         className="reader-jump-zone"
         onPointerDown={startJumpGesture}
         onPointerMove={updateJumpGesture}
-        onPointerUp={finishJumpGesture}
-        onPointerCancel={finishJumpGesture}
-        onLostPointerCapture={finishJumpGesture}
+        onPointerUp={commitJumpGesture}
+        onPointerCancel={cancelJumpGesture}
+        onLostPointerCapture={cancelJumpGesture}
         onDragStart={(event) => event.preventDefault()}
       >
         <section
