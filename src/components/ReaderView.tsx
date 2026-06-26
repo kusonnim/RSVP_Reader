@@ -122,6 +122,7 @@ function ReaderView({
   const jumpPointerId = useRef<number | null>(null);
   const jumpHoldTimerId = useRef<number | null>(null);
   const pendingJumpPreview = useRef<JumpPreview | null>(null);
+  const readerViewRef = useRef<HTMLElement | null>(null);
   const progressFillRef = useRef<SVGRectElement | null>(null);
   const [jumpPreview, setJumpPreview] = useState<JumpPreview | null>(null);
   const [thumbPosition, setThumbPosition] =
@@ -136,7 +137,7 @@ function ReaderView({
 
   const getJumpPreview = (
     event: PointerEvent<HTMLElement>,
-    element: HTMLElement,
+    readerElement: HTMLElement,
   ): JumpPreview | null => {
     const progressFill = progressFillRef.current;
 
@@ -144,7 +145,7 @@ function ReaderView({
       return null;
     }
 
-    const rect = element.getBoundingClientRect();
+    const rect = readerElement.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     const nearestPoint = getNearestPathPercent(progressFill, x, y);
@@ -163,7 +164,13 @@ function ReaderView({
   };
 
   const startJumpGesture = (event: PointerEvent<HTMLElement>) => {
-    const preview = getJumpPreview(event, event.currentTarget);
+    const readerElement = readerViewRef.current;
+
+    if (!readerElement) {
+      return;
+    }
+
+    const preview = getJumpPreview(event, readerElement);
 
     if (!preview) {
       return;
@@ -189,7 +196,13 @@ function ReaderView({
 
     event.preventDefault();
 
-    const preview = getJumpPreview(event, event.currentTarget);
+    const readerElement = readerViewRef.current;
+
+    if (!readerElement) {
+      return;
+    }
+
+    const preview = getJumpPreview(event, readerElement);
 
     if (!preview) {
       return;
@@ -311,13 +324,8 @@ function ReaderView({
         })}
       </div>
 
-      <section
-        className={`reader-view${isHolding ? " is-reading" : ""}${
-          jumpPreview ? " is-jumping" : ""
-        }`}
-        aria-label="Reader"
-        aria-live="polite"
-        aria-atomic="true"
+      <div
+        className="reader-jump-zone"
         onPointerDown={startJumpGesture}
         onPointerMove={updateJumpGesture}
         onPointerUp={finishJumpGesture}
@@ -325,78 +333,88 @@ function ReaderView({
         onLostPointerCapture={finishJumpGesture}
         onDragStart={(event) => event.preventDefault()}
       >
-        <svg className="reader-progress-outline" aria-hidden="true">
-          <rect
-            className="reader-progress-track"
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            rx="16"
-            ry="16"
-            pathLength="100"
-          />
-          <rect
-            ref={progressFillRef}
-            className="reader-progress-fill"
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            rx="16"
-            ry="16"
-            pathLength="100"
-            strokeDasharray="100"
-            strokeDashoffset={100 - displayProgress}
-          />
-          <circle
-            className="reader-progress-thumb"
-            cx={thumbPosition.x}
-            cy={thumbPosition.y}
-            r="4"
-            pathLength="100"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
+        <section
+          ref={readerViewRef}
+          className={`reader-view${isHolding ? " is-reading" : ""}${
+            jumpPreview ? " is-jumping" : ""
+          }`}
+          aria-label="Reader"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <svg className="reader-progress-outline" aria-hidden="true">
+            <rect
+              className="reader-progress-track"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
+              rx="16"
+              ry="16"
+              pathLength="100"
+            />
+            <rect
+              ref={progressFillRef}
+              className="reader-progress-fill"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
+              rx="16"
+              ry="16"
+              pathLength="100"
+              strokeDasharray="100"
+              strokeDashoffset={100 - displayProgress}
+            />
+            <circle
+              className="reader-progress-thumb"
+              cx={thumbPosition.x}
+              cy={thumbPosition.y}
+              r="4"
+              pathLength="100"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
 
-        <div className="reader-focus-word">
-          <span className="reader-fixed-mark reader-fixed-mark-open">
-            {currentPresentation.openMarks}
+          <div className="reader-focus-word">
+            <span className="reader-fixed-mark reader-fixed-mark-open">
+              {currentPresentation.openMarks}
+            </span>
+            <span
+              className={`reader-word reader-word-current ${currentLengthClass}`}
+            >
+              <span className="orp-before">{orpParts.before}</span>
+              <span className="orp-focus">{orpParts.focus}</span>
+              <span className="orp-after">{orpParts.after}</span>
+            </span>
+            <span className="reader-fixed-mark reader-fixed-mark-close">
+              {currentPresentation.closeMarks}
+            </span>
+          </div>
+          <span className="visually-hidden">
+            Current word: {words[currentIndex]}
           </span>
+          <span className="reader-progress-label" aria-hidden="true">
+            {((jumpPreview?.index ?? currentIndex) + 1).toLocaleString()} /{" "}
+            {words.length.toLocaleString()}
+          </span>
+          {jumpPreview ? (
+            <span className="reader-jump-preview" aria-hidden="true">
+              Jump to {Math.round(jumpPreview.percent * 100)}% - word{" "}
+              {(jumpPreview.index + 1).toLocaleString()}
+            </span>
+          ) : null}
           <span
-            className={`reader-word reader-word-current ${currentLengthClass}`}
-          >
-            <span className="orp-before">{orpParts.before}</span>
-            <span className="orp-focus">{orpParts.focus}</span>
-            <span className="orp-after">{orpParts.after}</span>
-          </span>
-          <span className="reader-fixed-mark reader-fixed-mark-close">
-            {currentPresentation.closeMarks}
-          </span>
-        </div>
-        <span className="visually-hidden">
-          Current word: {words[currentIndex]}
-        </span>
-        <span className="reader-progress-label" aria-hidden="true">
-          {((jumpPreview?.index ?? currentIndex) + 1).toLocaleString()} /{" "}
-          {words.length.toLocaleString()}
-        </span>
-        {jumpPreview ? (
-          <span className="reader-jump-preview" aria-hidden="true">
-            Jump to {Math.round(jumpPreview.percent * 100)}% - word{" "}
-            {(jumpPreview.index + 1).toLocaleString()}
-          </span>
-        ) : null}
-        <span
-          className="visually-hidden"
-          role="progressbar"
-          aria-label="Reading progress"
-          aria-valuemin={0}
-          aria-valuemax={words.length}
-          aria-valuenow={currentWordNumber}
-          aria-valuetext={`Word ${currentWordNumber} of ${words.length}`}
-        />
-      </section>
+            className="visually-hidden"
+            role="progressbar"
+            aria-label="Reading progress"
+            aria-valuemin={0}
+            aria-valuemax={words.length}
+            aria-valuenow={currentWordNumber}
+            aria-valuetext={`Word ${currentWordNumber} of ${words.length}`}
+          />
+        </section>
+      </div>
     </div>
   );
 }
