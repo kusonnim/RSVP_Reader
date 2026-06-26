@@ -26,6 +26,12 @@ const allDelimiterCharacters = new Set([
   ...symmetricDelimiters,
 ]);
 const boundaryPunctuationPattern = /[\p{P}\p{S}]/u;
+const latinLetterPattern = /\p{Script=Latin}/u;
+
+type DelimiterEvent = {
+  mark: string;
+  position: "leading" | "trailing";
+};
 
 function findLastMatchingIndex(
   state: DelimiterState,
@@ -51,6 +57,12 @@ function toggleSymmetricDelimiter(state: DelimiterState, mark: string) {
   } else {
     state.push({ open: mark, close: mark });
   }
+}
+
+function hasMatchingSymmetricDelimiter(state: DelimiterState, mark: string) {
+  return state.some(
+    (delimiter) => delimiter.open === mark && delimiter.close === mark,
+  );
 }
 
 function applyDelimiter(
@@ -97,50 +109,81 @@ function applyDelimiter(
   }
 }
 
-function getBoundaryDelimiters(word: string) {
+function isInsideLatinWord(characters: string[], index: number) {
+  return (
+    index > 0 &&
+    index < characters.length - 1 &&
+    latinLetterPattern.test(characters[index - 1]) &&
+    latinLetterPattern.test(characters[index + 1])
+  );
+}
+
+function isLeadingDelimiterPosition(characters: string[], index: number) {
+  return (
+    index === 0 ||
+    boundaryPunctuationPattern.test(characters[index - 1])
+  );
+}
+
+function shouldApplyDelimiter(
+  state: DelimiterState,
+  characters: string[],
+  index: number,
+) {
+  const mark = characters[index];
+
+  if (!allDelimiterCharacters.has(mark)) {
+    return false;
+  }
+
+  if (pairedDelimiters.has(mark)) {
+    return isLeadingDelimiterPosition(characters, index);
+  }
+
+  const expectedOpen = closingDelimiters.get(mark);
+
+  if (expectedOpen) {
+    return state.some(
+      (delimiter) =>
+        delimiter.open === expectedOpen && delimiter.close === mark,
+    );
+  }
+
+  if (symmetricDelimiters.has(mark)) {
+    if (mark === "'" && isInsideLatinWord(characters, index)) {
+      return false;
+    }
+
+    if (hasMatchingSymmetricDelimiter(state, mark)) {
+      return index > 0;
+    }
+
+    return isLeadingDelimiterPosition(characters, index);
+  }
+
+  return false;
+}
+
+function getWordDelimiters(state: DelimiterState, word: string) {
   const characters = Array.from(word);
-  const leading: string[] = [];
-  const trailing: string[] = [];
-  const preservedLeading: string[] = [];
-  const preservedTrailing: string[] = [];
-  let start = 0;
-  let end = characters.length;
+  const events: DelimiterEvent[] = [];
+  const text: string[] = [];
 
-  while (
-    start < end &&
-    boundaryPunctuationPattern.test(characters[start])
-  ) {
-    if (allDelimiterCharacters.has(characters[start])) {
-      leading.push(characters[start]);
+  for (let index = 0; index < characters.length; index += 1) {
+    const mark = characters[index];
+
+    if (shouldApplyDelimiter(state, characters, index)) {
+      const position = isLeadingDelimiterPosition(characters, index)
+        ? "leading"
+        : "trailing";
+      events.push({ mark, position });
+      applyDelimiter(state, mark, position);
     } else {
-      preservedLeading.push(characters[start]);
+      text.push(mark);
     }
-
-    start += 1;
   }
 
-  while (
-    end > start &&
-    boundaryPunctuationPattern.test(characters[end - 1])
-  ) {
-    if (allDelimiterCharacters.has(characters[end - 1])) {
-      trailing.unshift(characters[end - 1]);
-    } else {
-      preservedTrailing.unshift(characters[end - 1]);
-    }
-
-    end -= 1;
-  }
-
-  return {
-    leading,
-    trailing,
-    text: [
-      ...preservedLeading,
-      ...characters.slice(start, end),
-      ...preservedTrailing,
-    ].join(""),
-  };
+  return { events, text: text.join("") };
 }
 
 function processWord(
@@ -148,14 +191,11 @@ function processWord(
   word: string,
   observedStates?: DelimiterState[],
 ) {
-  const boundaries = getBoundaryDelimiters(word);
+  const stateForScanning = [...state];
+  const boundaries = getWordDelimiters(stateForScanning, word);
 
-  boundaries.leading.forEach((mark) => {
-    applyDelimiter(state, mark, "leading");
-    observedStates?.push([...state]);
-  });
-  boundaries.trailing.forEach((mark) => {
-    applyDelimiter(state, mark, "trailing");
+  boundaries.events.forEach(({ mark, position }) => {
+    applyDelimiter(state, mark, position);
     observedStates?.push([...state]);
   });
 
