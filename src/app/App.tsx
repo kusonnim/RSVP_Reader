@@ -8,6 +8,7 @@ import { useHoldPlayback } from "../hooks/useHoldPlayback";
 import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import { useReaderPersistence } from "../hooks/useReaderPersistence";
 import { useReaderState } from "../hooks/useReaderState";
+import { vibrate } from "../lib/haptics";
 import type {
   LoadedReaderDocument,
   ReaderChapter,
@@ -84,6 +85,7 @@ function App() {
     }
 
     setSelectedChapterIndex(chapterIndex);
+    vibrate([12, 18, 12]);
     loadText(chapter.text);
   };
 
@@ -97,6 +99,7 @@ function App() {
     }
 
     setSelectedChapterIndex(nextChapterIndex);
+    vibrate([12, 18, 12]);
     loadText(chapter.text, 0, { keepHolding: true });
   }, [chapters, loadText, selectedChapterIndex, setHolding]);
 
@@ -109,6 +112,7 @@ function App() {
     }
 
     setSelectedChapterIndex(previousChapterIndex);
+    vibrate([12, 18, 12]);
     loadText(chapter.text, Number.MAX_SAFE_INTEGER, { keepHolding: true });
   }, [chapters, loadText, selectedChapterIndex]);
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { vibrate } from "../lib/haptics";
 import { splitWordAtOrp } from "../lib/orp";
 import { getReaderWordPresentation } from "../lib/readerDelimiters";
 
@@ -118,6 +119,7 @@ function ReaderView({
     jumpHoldTimerId.current = window.setTimeout(() => {
       jumpHoldTimerId.current = null;
       onJumpStart();
+      vibrate([10, 20, 10]);
       setJumpPreview(pendingJumpPreview.current);
     }, JUMP_HOLD_DELAY_MS);
   };

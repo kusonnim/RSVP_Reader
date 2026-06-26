@@ -3,6 +3,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
+import { vibrate } from "../lib/haptics";
 
 type HoldToReadButtonProps = {
   canRead: boolean;
@@ -39,6 +40,7 @@ function HoldToReadButton({
     lastScrubX.current = event.clientX;
     hasPausedForScrub.current = false;
     event.currentTarget.setPointerCapture(event.pointerId);
+    vibrate(8);
     onHoldingChange(true);
   };
 
@@ -81,6 +83,7 @@ function HoldToReadButton({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
 
+    vibrate(6);
     onHoldingChange(false);
   };
 
@@ -91,6 +94,7 @@ function HoldToReadButton({
       (event.key === " " || event.key === "Enter")
     ) {
       event.preventDefault();
+      vibrate(8);
       onHoldingChange(true);
     }
   };
@@ -98,6 +102,7 @@ function HoldToReadButton({
   const handleKeyUp = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (event.key === " " || event.key === "Enter") {
       event.preventDefault();
+      vibrate(6);
       onHoldingChange(false);
     }
   };
